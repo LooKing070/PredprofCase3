@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>970</width>
+    <width>1029</width>
     <height>800</height>
    </rect>
   </property>
@@ -35,6 +35,12 @@
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
         <widget class="QWidget" name="interpreterWidgets" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>500</width>
+           <height>0</height>
+          </size>
+         </property>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <property name="spacing">
            <number>0</number>
@@ -141,6 +147,12 @@
        </item>
        <item>
         <widget class="QWidget" name="boardWigets" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>500</width>
+           <height>0</height>
+          </size>
+         </property>
          <layout class="QVBoxLayout" name="verticalLayout">
           <property name="spacing">
            <number>0</number>
@@ -158,17 +170,29 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QPushButton" name="runButton">
-            <property name="text">
-             <string>run</string>
+           <widget class="QWidget" name="buttonsSorter" native="true">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>60</height>
+             </size>
             </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="stopButton">
-            <property name="text">
-             <string>stop</string>
-            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <item>
+              <widget class="QPushButton" name="runButton">
+               <property name="text">
+                <string>run</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="stopButton">
+               <property name="text">
+                <string>stop</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
           <item>
@@ -177,6 +201,16 @@
              <number>0</number>
             </property>
            </layout>
+          </item>
+          <item>
+           <widget class="QPlainTextEdit" name="plainTextEdit">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>250</height>
+             </size>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -192,7 +226,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>970</width>
+     <width>1029</width>
      <height>26</height>
     </rect>
    </property>
