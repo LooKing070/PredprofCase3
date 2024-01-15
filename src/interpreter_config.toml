@@ -1,3 +1,4 @@
+# single keyword commands
 [MOVE_COMMANDS]
 RIGHT = "pass" # python code
 LEFT = "pass"
@@ -6,4 +7,11 @@ DOWN = "pass"
 [MOVE_COMMANDS.structure]
 args_count = 1
 args_type = "int"
+args_format = "*"
 
+[VARIABLE_COMMANDS]
+SET = "pass"
+[VARIABLE_COMMANDS.structure]
+args_count
+
+# double keyword commands

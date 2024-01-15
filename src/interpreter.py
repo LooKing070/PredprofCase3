@@ -17,6 +17,8 @@ class Interpreter:
                     self.keyword_list.append(key)
                     self.keyword_category_list.append(category)
 
+        self.code_variables = {}
+
     def parse_code(self, code: str) -> str:
         """Преобразует код приложения в код Python. Возвращет ошибку при неправильном коде"""
         code = code.strip().split("\n")
@@ -26,11 +28,11 @@ class Interpreter:
             if line[0] not in self.keyword_list:
                 return f"Неизвестное кодовое слово '{line[0]}' на строке {line_number + 1}"
             else:
-                return self.parse_line(line)
+                return self._parse_line(line)
 
         return "Код успешно преобразован"
 
-    def parse_line(self, line: list, type: str = "keyword") -> str:
+    def _parse_line(self, line: list, type: str = "keyword") -> str:
         if type == "keyword":
             keyword, category = None, None
             for keyword, category in zip(self.keyword_list, self.keyword_category_list):
@@ -43,8 +45,6 @@ class Interpreter:
             structure = self.config[category]["structure"]
             if len(line[1:]) != structure["args_count"]:
                 return f"Неверное колличество аргументов ({len(line[1:])}) для {keyword}"
-
-
 
     def reload_config(self) -> None:
         with open("interpreter_config.toml", "r") as f:
