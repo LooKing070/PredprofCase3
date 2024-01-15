@@ -1,0 +1,9 @@
+[MOVE_COMMANDS]
+RIGHT = "pass" # python code
+LEFT = "pass"
+UP = "pass"
+DOWN = "pass"
+[MOVE_COMMANDS.structure]
+args_count = 1
+args_type = "int"
+
