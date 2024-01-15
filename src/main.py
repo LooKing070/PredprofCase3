@@ -10,3 +10,11 @@ try:
     pass  # код запуска приложения
 except Exception as e:
     logging.critical(e, exc_info=True)
+
+
+def main():
+    pass
+
+
+if __name__ == "__main__":
+    main()
