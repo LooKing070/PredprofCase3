@@ -2,8 +2,7 @@ import csv
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import QTimer
-from interface.game_ui import Ui_GameWindow
-from game_result import ResultWidget
+from designs.game_ui import Ui_GameWindow
 from random import randint
 
 
