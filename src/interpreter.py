@@ -1,42 +1,92 @@
-import ply.lex as lex
-import ply.yacc as yacc
+import logging
+import sys
 
-# Определение токенов
-tokens = ['UP', 'NUMERIC']
+import tomli
 
-# Игнорирование пробелов и табуляций
-t_ignore = ' \t'
+import re
 
-# Обработка токенов
-def t_NUMERIC(t):
-    r'\d+'
-    t.value = int(t.value)
-    return t
 
-# Обработка ошибок
-def t_error(t):
-    print(f"Нераспознанный символ: '{t.value[0]}'")
-    t.lexer.skip(1)
+class Interpreter:
+    def __init__(self) -> None:
+        self.__config = {}
+        self.reload_config()
 
-def p_error(p):
-    print(f"Syntax error at line {p.lineno}, token={p.type}")
+        self.single_keywords = self.__config["SINGLE_KEYWORDS"]
 
-# Правила грамматики
-def p_command(p):
-    '''
-    command : UP NUMERIC
-    '''
-    print(f'Parsed command: {p[1]} {p[2]}')
+        self._program_variables = {}
+        self._procedures = {}
 
-# Создание лексера и парсера
-lexer = lex.lex()
-parser = yacc.yacc()
+    def parse_code(self, code: str) -> tuple[int, str] | None:
+        """Преобразует код приложения в код Python. Возвращет строку-ошибку при неправильном коде"""
+        code = code.strip().split("\n")
+        code = [line.upper() for line in code if line.strip()]
+        for line_index, line in enumerate(code):
+            # single keyword checking
+            for mask in self.single_keywords:
+                if re.fullmatch(mask, line):
+                    error_message = self._interpret_line(line, self.single_keywords[mask])
+                    if error_message:
+                        return line_index, error_message
+                    break
+            else:
+                return line_index, "Строка кода содержит синтаксические ошибки или отсутсвуют необходимые пробелы"
 
-# Пример использования
-data = "UP 42"
-lexer.input(data)
+            # double keyword checking
 
-for token in lexer:
-    print(token)
+        logging.info("Код успешно интерперетирован и выполнен")
+        return -1, "Код успешно выполнен"
 
-result = parser.parse(data, lexer=lexer)
+    def _interpret_line(self, line: str, keyword_info: list) -> str | None:
+        import inspect
+        line = line.split()
+        func = eval(keyword_info[0])
+        args = []
+        if inspect.ismethod(func):
+            for arg in keyword_info[1:]:
+                if type(arg) is str:
+                    args.append(arg)
+                else:
+                    args.append(line[arg])
+            error_message = func(*args)
+            if error_message:
+                return error_message
+        else:
+            logging.critical("Ошибка интерпретатора")
+            logging.critical(f"Попытка вызова несуществующего метода '{keyword_info[0]}'")
+            sys.exit()
+
+    def move_player(self, direction: str, step: int) -> str | None:
+        logging.debug(f"Игрок перемешён в направлении {direction} на {step} шагов")
+        return None
+
+    def set_program_variable(self, var_name: str, value: int):
+        self._program_variables[var_name] = value
+        logging.debug(f"Значение переменной {var_name} установлено на {value}")
+
+    def call_procedure(self, procedure_name: str) -> ...: # yet to be done
+        logging.warning(f"Попытка вызова процедуры {procedure_name}. Функция недоступна")
+        return "Вызов процедур находится в разработке и не может быть выполнен"
+
+
+    def reload_config(self) -> None:
+        with open("interpreter_config.toml", "rb") as f:
+            self.__config = tomli.load(f)
+
+    def empty_func(self, *args) -> None:
+        """Placeholder for interpreter config"""
+        pass
+
+
+if __name__ == "__main__":
+    logging.basicConfig(filename="logs",
+                        filemode='w',
+                        format='%(asctime)s %(filename)s: %(levelname)s "%(message)s" at line %(lineno)d',
+                        datefmt='%H:%M:%S',
+                        level=logging.DEBUG)
+    interp = Interpreter()
+    error_code = interp.parse_code('''
+LEFT 1
+SET N = 3
+CALL n
+    ''')
+    print(error_code)

@@ -1,17 +1,8 @@
-[SINGLE_KEYWORDS.tokens]
-UP = "print()"
-DOWN = "print()"
-LEFT = "print()"
-RIGHT = "print()"
-SET = "print()"
-CALL = "print()"
-NUMERIC = "print()"
-
-[SINGLE_KEYWORDS.token_masks]
-UP = "^UP \\d+$"
-DOWN = "^DOWN \\d+$"
-LEFT = "^LEFT \\d+$"
-RIGHT = "^RIGHT \\d+$"
-SET = "^SET [a-zA-Z]+[ \t]*=[ \t]*\\d+$"
-CALL = "^CALL[ \t]+[a-zA-Z]+$"
-NUMERIC = "^\\d+$"
+[SINGLE_KEYWORDS]
+#KEYWORD; пробелы/отступы; другое(аргументы, доп. синтаксис) = [имя функци, *(строка - аргумент; число - индекс элемента строки)]
+"UP[ \t]+[0-9]+" = ["self.move_player", "UP", 1]
+"DOWN[ \t]+[0-9]+" = ["self.move_player", "DOWN", 1]
+"LEFT[ \t]+[0-9]+" = ["self.move_player", "LEFT", 1]
+"RIGHT[ \t]+[0-9]+" = ["self.move_player", "RIGHT", 1]
+"SET[ \t]*[a-zA-Z]+[ \t]*=[ \t]*[0-9]+" = ["self.set_program_variable", 1, 3] # пока что необходимы пробелы рядом с символом =
+"CALL[ \t]+[a-zA-Z]+" = ["self.call_procedure", 1]
