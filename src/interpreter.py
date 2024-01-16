@@ -63,14 +63,17 @@ class Interpreter:
         self._program_variables[var_name] = value
         logging.debug(f"Значение переменной {var_name} установлено на {value}")
 
-    def call_procedure(self, procedure_name: str) -> ...: # yet to be done
+    def call_procedure(self, procedure_name: str) -> ...:  # yet to be done
         logging.warning(f"Попытка вызова процедуры {procedure_name}. Функция недоступна")
         return "Вызов процедур находится в разработке и не может быть выполнен"
-
 
     def reload_config(self) -> None:
         with open("interpreter_config.toml", "rb") as f:
             self.__config = tomli.load(f)
+
+    def check_names(self):
+        if set(self._program_variables.keys()).intersection(set(self._procedures.keys())):
+            print("Имена процедур и переменных совпадают")
 
     def empty_func(self, *args) -> None:
         """Placeholder for interpreter config"""
@@ -87,6 +90,7 @@ if __name__ == "__main__":
     error_code = interp.parse_code('''
 LEFT 1
 SET N = 3
-CALL n
     ''')
+    interp._procedures["N"] = 2
+    interp.check_names()
     print(error_code)
