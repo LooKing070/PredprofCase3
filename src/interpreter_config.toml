@@ -1,17 +1,17 @@
-# single keyword commands
-[MOVE_COMMANDS]
-RIGHT = "pass" # python code
-LEFT = "pass"
-UP = "pass"
-DOWN = "pass"
-[MOVE_COMMANDS.structure]
-args_count = 1
-args_type = "int"
-args_format = "*"
+[SINGLE_KEYWORDS.tokens]
+UP = "print()"
+DOWN = "print()"
+LEFT = "print()"
+RIGHT = "print()"
+SET = "print()"
+CALL = "print()"
+NUMERIC = "print()"
 
-[VARIABLE_COMMANDS]
-SET = "pass"
-[VARIABLE_COMMANDS.structure]
-args_count
-
-# double keyword commands
+[SINGLE_KEYWORDS.token_masks]
+UP = "^UP \\d+$"
+DOWN = "^DOWN \\d+$"
+LEFT = "^LEFT \\d+$"
+RIGHT = "^RIGHT \\d+$"
+SET = "^SET [a-zA-Z]+[ \t]*=[ \t]*\\d+$"
+CALL = "^CALL[ \t]+[a-zA-Z]+$"
+NUMERIC = "^\\d+$"

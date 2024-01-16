@@ -1,60 +1,42 @@
-import logging
+import ply.lex as lex
+import ply.yacc as yacc
 
-import toml
+# Определение токенов
+tokens = ['UP', 'NUMERIC']
 
+# Игнорирование пробелов и табуляций
+t_ignore = ' \t'
 
-class Interpreter:
-    def __init__(self) -> None:
-        self.config = {}
-        self.reload_config()
+# Обработка токенов
+def t_NUMERIC(t):
+    r'\d+'
+    t.value = int(t.value)
+    return t
 
-        self.keyword_list = []
-        self.keyword_category_list = []
-        keyword_exceptions = ["structure"]
-        for category in self.config:
-            for key in self.config[category]:
-                if key not in keyword_exceptions:
-                    self.keyword_list.append(key)
-                    self.keyword_category_list.append(category)
+# Обработка ошибок
+def t_error(t):
+    print(f"Нераспознанный символ: '{t.value[0]}'")
+    t.lexer.skip(1)
 
-        self.code_variables = {}
+def p_error(p):
+    print(f"Syntax error at line {p.lineno}, token={p.type}")
 
-    def parse_code(self, code: str) -> str:
-        """Преобразует код приложения в код Python. Возвращет ошибку при неправильном коде"""
-        code = code.strip().split("\n")
-        code = [line.upper() for line in code if line.strip()]
-        for line_number, line in enumerate(code):
-            line = line.split()
-            if line[0] not in self.keyword_list:
-                return f"Неизвестное кодовое слово '{line[0]}' на строке {line_number + 1}"
-            else:
-                return self._parse_line(line)
+# Правила грамматики
+def p_command(p):
+    '''
+    command : UP NUMERIC
+    '''
+    print(f'Parsed command: {p[1]} {p[2]}')
 
-        return "Код успешно преобразован"
+# Создание лексера и парсера
+lexer = lex.lex()
+parser = yacc.yacc()
 
-    def _parse_line(self, line: list, type: str = "keyword") -> str:
-        if type == "keyword":
-            keyword, category = None, None
-            for keyword, category in zip(self.keyword_list, self.keyword_category_list):
-                if line[0] == keyword:
-                    break
-            else:
-                logging.critical(f"Кодовое слово {line[0]} было удалено во время парсинга")
-                return "Интерпретатор закончил работу из-за критической ошибки"
+# Пример использования
+data = "UP 42"
+lexer.input(data)
 
-            structure = self.config[category]["structure"]
-            if len(line[1:]) != structure["args_count"]:
-                return f"Неверное колличество аргументов ({len(line[1:])}) для {keyword}"
+for token in lexer:
+    print(token)
 
-    def reload_config(self) -> None:
-        with open("interpreter_config.toml", "r") as f:
-            self.config = toml.load(f)
-
-
-if __name__ == "__main__":
-    interp = Interpreter()
-    error_code = interp.parse_code('''
-Up 12354ueretdhnbxfg ghfgd
-DOWN fgfdgdfgd
-    ''')
-    print(error_code)
+result = parser.parse(data, lexer=lexer)

@@ -3,7 +3,7 @@ import ply.lex as lex
 tokens = (
     "NUMBER",
     "NAME",
-    "SPACE"
+    "SPACE",
 )
 
 
