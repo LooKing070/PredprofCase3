@@ -58,22 +58,6 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QPlainTextEdit" name="nomeraStrok">
-            <property name="minimumSize">
-             <size>
-              <width>10</width>
-              <height>10</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>40</width>
-              <height>16777215</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item>
            <widget class="QTabWidget" name="tabWidget">
             <property name="maximumSize">
              <size>
@@ -84,37 +68,6 @@
             <property name="currentIndex">
              <number>0</number>
             </property>
-            <widget class="QWidget" name="mainTabWidget">
-             <property name="minimumSize">
-              <size>
-               <width>802</width>
-               <height>0</height>
-              </size>
-             </property>
-             <attribute name="title">
-              <string>main</string>
-             </attribute>
-             <layout class="QVBoxLayout" name="verticalLayout_2">
-              <property name="spacing">
-               <number>0</number>
-              </property>
-              <property name="leftMargin">
-               <number>0</number>
-              </property>
-              <property name="topMargin">
-               <number>0</number>
-              </property>
-              <property name="rightMargin">
-               <number>0</number>
-              </property>
-              <property name="bottomMargin">
-               <number>0</number>
-              </property>
-              <item>
-               <widget class="QPlainTextEdit" name="mainEdit"/>
-              </item>
-             </layout>
-            </widget>
             <widget class="QWidget" name="plusTabWidjet">
              <attribute name="title">
               <string>+</string>
@@ -135,9 +88,6 @@
               <property name="bottomMargin">
                <number>0</number>
               </property>
-              <item>
-               <widget class="QPlainTextEdit" name="plusEdit"/>
-              </item>
              </layout>
             </widget>
            </widget>
