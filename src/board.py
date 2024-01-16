@@ -14,19 +14,13 @@ class GameLogic(QWidget, Ui_GameWindow):
         with open(f"../data/level{level}/uroven.txt", "r") as u:
             levelStructure = u.readlines()
         # таймеры
-        self.stopTimer, self.hummerTimer, self.buttonsTimer = QTimer(), QTimer(), QTimer()
+        self.stopTimer = QTimer()
         self.looseTimer, self.animationTimer = QTimer(), QTimer()
         self.animationTimer.setInterval(1000)
         self.looseTimer.setInterval(int(self.levelStats["ban_time"]))
         self.stopTimer.setInterval(int(self.levelStats["buttons_time"]) // 2)
-        self.hummerTimer.setInterval(int(self.levelStats["ban_time_range"]))
-        self.buttonsTimer.setInterval(int(self.levelStats["buttons_time"]))
-        self.buttonsTimer.timeout.connect(self.trolling_buttons)
-        self.hummerTimer.timeout.connect(self.ban_hummer)
         self.looseTimer.timeout.connect(self.loose)
         self.animationTimer.timeout.connect(lambda: self.animan("exitButton"))
-        self.buttonsTimer.start()
-        self.hummerTimer.start()
         self.looseTimer.start()
         self.animationTimer.start()
         # геймплейные параметры
@@ -34,9 +28,7 @@ class GameLogic(QWidget, Ui_GameWindow):
         self.trollPosition = [int(self.levelStats["x"]) // 2, int(self.levelStats["y"]) - 2]
         self.levelStructure = [[j for j in i.rstrip()] for i in levelStructure]
         self.playUi(self, levelStructure, int(self.levelStats["x"]) * int(self.levelStats["y"]))
-        self.create_hummers(int(self.levelStats["hummers"]))
         self.troll = self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0])
-        self.hummers = []
         # кнопки действий
         self.exitButton_2.clicked.connect(self.loose)
         self.upButton.clicked.connect(self.troll_move)
@@ -45,26 +37,26 @@ class GameLogic(QWidget, Ui_GameWindow):
         self.leftButton.clicked.connect(self.troll_move)
 
     def troll_move(self):  # куда пойдёт игрок
-        if self.sender().text() == "🠕":
+        if self.sender().text() == "UP":
             if self.move_try([self.trollPosition[0], self.trollPosition[1] - 1]):
                 self.troll_moving((0, -1))
             else:
-                self.troll_stop(False)
-        elif self.sender().text() == "🠔":
+                pass
+        elif self.sender().text() == "LEFT":
             if self.move_try([self.trollPosition[0] - 1, self.trollPosition[1]]):
                 self.troll_moving((-1, 0))
             else:
-                self.troll_stop(False)
-        elif self.sender().text() == "🠖":
+                pass
+        elif self.sender().text() == "RIGHT":
             if self.move_try([self.trollPosition[0] + 1, self.trollPosition[1]]):
                 self.troll_moving((1, 0))
             else:
-                self.troll_stop(False)
-        elif self.sender().text() == "🠗":
+                pass
+        elif self.sender().text() == "DOWN":
             if self.move_try([self.trollPosition[0], self.trollPosition[1] + 1]):
                 self.troll_moving((0, 1))
             else:
-                self.troll_stop(False)
+                pass
 
     def move_try(self, sector_x_y):  # что произойдёт, если игрок куда-то пойдёт
         if self.levelStructure[sector_x_y[1]][sector_x_y[0]] == "W":
