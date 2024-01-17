@@ -20,8 +20,15 @@ class MyWidget(QMainWindow, Ui_Soft):
         self.setupUi(self)
         self.setWindowTitle('Собственный интерпретатор')
 
-        widget = Window_In_QTabWidget('main', text)
-        self.tabWidget.insertTab(0, widget, 'main')
+
+        con = sqlite3.connect("sql_bd.db")
+        cur = con.cursor()
+        for lst in cur.execute('''SELECT * FROM files''').fetchall():
+
+            widget = Window_In_QTabWidget(lst[0], lst[1])
+            self.tabWidget.insertTab(self.tabWidget.count() - 1, widget, lst[0])
+        con.commit()
+        con.close()
         self.tabWidget.setCurrentIndex(0)
 
         self.tabWidget.tabBarClicked.connect(self.create_new_file)
@@ -36,10 +43,9 @@ class MyWidget(QMainWindow, Ui_Soft):
 
                     con = sqlite3.connect("sql_bd.db")
                     cur = con.cursor()
-                    cur.execute(f"""INSERT INTO files VALUES ({name}, '')""")
+                    cur.execute(f"""INSERT INTO files VALUES ('{name}', '')""")
                     con.commit()
                     con.close()
-                    print(name)
                 else:
                     print('Это имя уже есть')
             else:
@@ -60,10 +66,12 @@ class Window_In_QTabWidget(QWidget):
         self.numbers_lines.setReadOnly(True)
         self.numbers_lines.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.text = QPlainTextEdit()
+        self.text.setPlainText(text)
         layout.addWidget(self.numbers_lines)
         layout.addWidget(self.text)
         self.setLayout(layout)
         self.name = name
+        self.save_text_and_update_numbers()
 
         self.text.textChanged.connect(self.save_text_and_update_numbers)
 
@@ -71,11 +79,9 @@ class Window_In_QTabWidget(QWidget):
         self.numbers_lines.setPlainText('\n'.join(map(str, range(1, len(self.text.toPlainText().split('\n')) + 1))))
         con = sqlite3.connect("sql_bd.db")
         cur = con.cursor()
-        print(self.text.toPlainText(), self.name)
-        print(cur.execute('''SELECT name FROM files''').fetchall())
         cur.execute(f"""UPDATE files
-                        SET content = {self.text.toPlainText()}
-                        WHERE name = {self.name}""")
+                        SET content = '{self.text.toPlainText()}'
+                        WHERE name = '{self.name}'""")
         con.commit()
 
 
