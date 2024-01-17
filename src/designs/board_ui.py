@@ -73,14 +73,14 @@ class Ui_Soft(object):
                     exec(f'self.wall{n_se} = QtWidgets.QLabel(self.playZone)')
                     exec(f'self.wall{n_se}.setMaximumSize(QtCore.QSize(64, 64))')
                     exec(f'self.wall{n_se}.setText("")')
-                    exec(f'self.wall{n_se}.setPixmap(QtGui.QPixmap("../grafika/AirBanTexW.jpg"))')
+                    exec(f'self.wall{n_se}.setPixmap(QtGui.QPixmap("textures/PredInterpreterW.jpg"))')
                     exec(f'self.wall{n_se}.setObjectName("wall{n_se}")')
                     exec(f'self.gridLayout.addWidget(self.wall{n_se}, {n_string}, {column}, 1, 1)')
                 elif symbol == "G":
                     exec(f'self.ground{n_se} = QtWidgets.QLabel(self.playZone)')
                     exec(f'self.ground{n_se}.setMaximumSize(QtCore.QSize(64, 64))')
                     exec(f'self.ground{n_se}.setText("")')
-                    exec(f'self.ground{n_se}.setPixmap(QtGui.QPixmap("../grafika/AirBanTexG.jpg"))')
+                    exec(f'self.ground{n_se}.setPixmap(QtGui.QPixmap("textures/PredInterpreterG.jpg"))')
                     exec(f'self.ground{n_se}.setObjectName("ground{n_se}")')
                     exec(f'self.gridLayout.addWidget(self.ground{n_se}, {n_string}, {column}, 1, 1)')
                 else:
@@ -88,14 +88,14 @@ class Ui_Soft(object):
                         exec(f'self.finish{n_se} = QtWidgets.QLabel(self.playZone)')
                         exec(f'self.finish{n_se}.setMaximumSize(QtCore.QSize(64, 64))')
                         exec(f'self.finish{n_se}.setText("")')
-                        exec(f'self.finish{n_se}.setPixmap(QtGui.QPixmap("../grafika/AirBanTexF.jpg"))')
+                        exec(f'self.finish{n_se}.setPixmap(QtGui.QPixmap("textures/PredInterpreterF.jpg"))')
                         exec(f'self.finish{n_se}.setObjectName("finish{n_se}")')
                         exec(f'self.gridLayout.addWidget(self.finish{n_se}, {n_string}, {column}, 1, 1)')
                     else:
                         exec(f'self.troll{n_se} = QtWidgets.QLabel(self.playZone)')
                         exec(f'self.troll{n_se}.setMaximumSize(QtCore.QSize(64, 64))')
                         exec(f'self.troll{n_se}.setText("")')
-                        exec(f'self.troll{n_se}.setPixmap(QtGui.QPixmap("../grafika/AirBanTexT.jpg"))')
+                        exec(f'self.troll{n_se}.setPixmap(QtGui.QPixmap("textures/PredInterpreterT.jpg"))')
                         exec(f'self.troll{n_se}.setObjectName("troll{n_se}")')
                         exec(f'self.gridLayout.addWidget(self.troll{n_se}, {n_string}, {column}, 1, 1)')
                 n_sector += 1
