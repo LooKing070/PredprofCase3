@@ -3,7 +3,7 @@ import sqlite3
 import PyQt5
 from PyQt5.QtCore import Qt
 
-from designs.maket_prototype import Ui_Soft
+from designs.board_ui import Ui_Soft
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QVBoxLayout, QLabel, QLineEdit, QInputDialog, QWidget, \
     QPlainTextEdit, QHBoxLayout
@@ -17,7 +17,7 @@ def except_hook(cls, exception, traceback):
 class MyWidget(QMainWindow, Ui_Soft):
     def __init__(self):
         super().__init__()
-        self.setupUi(self)
+        self.setupUi(self, QMainWindow, ["WGWG", "WGWG", "WWWG"], 12)
         self.setWindowTitle('Собственный интерпретатор')
 
 

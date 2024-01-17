@@ -2,7 +2,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class Ui_Soft(object):
-    def playUi(self, GameWindow, level_structure, sectors):
+    def setupUi(self, Soft, GameWindow, level_structure, sectors):
         Soft.setObjectName("Soft")
         Soft.resize(1029, 800)
         self.centralWindow = QtWidgets.QWidget(Soft)
@@ -53,7 +53,7 @@ class Ui_Soft(object):
         self.stopButton.setObjectName("stopButton")
         self.horizontalLayout_4.addWidget(self.stopButton)
         self.verticalLayout.addWidget(self.buttonsSorter)
-        self.playZone = QtWidgets.QWidget(self.GameGUI)
+        self.playZone = QtWidgets.QWidget(self.windowManager)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Maximum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
