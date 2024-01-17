@@ -13,28 +13,30 @@ class Interpreter:
 
         self.single_keywords = self.__config["SINGLE_KEYWORDS"]
         self.double_keywords = self.__config["DOUBLE_KEYWORDS"]
+        self._error_buffer = []
 
         self._program_variables = {}
         self._procedures = {}
+        self._program_buffer = []
 
     def parse_code(self, code: str) -> tuple[int, str] | None:
         """Преобразует код приложения в код Python. Возвращет строку-ошибку при неправильном коде"""
+
         code = code.strip().split("\n")
         code = [line.upper() for line in code if line.strip()]
         for line_index, line in enumerate(code):
             # single keyword checking
             for mask in self.single_keywords:
                 if re.fullmatch(mask, line):
-                    error_message = self._interpret_line(line, self.single_keywords[mask])
-                    if error_message:
-                        return line_index, error_message
-                    break
-            else:
-                return line_index, "Строка кода содержит синтаксические ошибки или отсутсвуют необходимые пробелы"
+                    self._interpret_line(line, self.single_keywords[mask])
+
 
         # double keyword checking
         for line_index, line in enumerate(code):
-            pass
+            for mask in self.double_keywords["openers"]:
+                print(mask, line)
+                if re.fullmatch(mask, line):
+                    self.get_code_block(code, line_index, mask, self.double_keywords["closers"][mask])
 
         logging.info("Код успешно интерперетирован и выполнен")
         return -1, "Код успешно выполнен"
@@ -50,9 +52,7 @@ class Interpreter:
                     args.append(arg)
                 else:
                     args.append(line[arg])
-            error_message = func(*args)
-            if error_message:
-                return error_message
+            func(*args)
         else:
             logging.critical("Ошибка интерпретатора")
             logging.critical(f"Попытка вызова несуществующего метода '{keyword_info[0]}'")
@@ -68,7 +68,14 @@ class Interpreter:
 
     def call_procedure(self, procedure_name: str) -> ...:  # yet to be done
         logging.warning(f"Попытка вызова процедуры {procedure_name}. Функция недоступна")
-        return "Вызов процедур находится в разработке и не может быть выполнен"
+        self._error_buffer.append("Вызов процедур находится в разработке и не может быть выполнен")
+
+    def get_repeating_sequence(self, repetitions: int) -> list[str]:
+        pass
+
+    def get_code_block(self, code: list[str], start_index: int, opener_mask: str, closer_mask: str) -> None:
+        code = code[start_index:]
+        print(code)
 
     def reload_config(self) -> None:
         with open("interpreter_config.toml", "rb") as f:
@@ -76,14 +83,29 @@ class Interpreter:
 
     def check_names(self):
         if set(self._program_variables.keys()).intersection(set(self._procedures.keys())):
-            print("Имена процедур и переменных совпадают")
+            self._error_buffer.append("Имена процедур и переменных не могут совпадать")
 
     def empty_func(self, *args) -> None:
         """Placeholder for interpreter config"""
         pass
 
     def add_program_call_to_buffer(self, data: str | list):
-        pass
+        if type(data) is str:
+            self._program_buffer.append(data)
+        else:
+            self._program_buffer.extend(data)
+
+    @property
+    def program_buffer(self):
+        temp = self._program_buffer.copy()
+        self._program_buffer.clear()
+        return temp
+
+    @property
+    def error_buffer(self):
+        temp = self._error_buffer.copy()
+        self._error_buffer.clear()
+        return temp
 
 
 if __name__ == "__main__":
@@ -96,7 +118,10 @@ if __name__ == "__main__":
     error_code = interp.parse_code('''
 LEFT 1
 SET N = 3
+REPEAT 3
+LEFT 2
+ENDREPEAT
     ''')
-    interp._procedures["N"] = 2
-    interp.check_names()
+    # interp._procedures["N"] = 2
+    # interp.check_names()
     print(error_code)
