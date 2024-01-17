@@ -6,3 +6,10 @@
 "RIGHT[ \t]+[0-9]+" = ["self.move_player", "RIGHT", 1]
 "SET[ \t]*[a-zA-Z]+[ \t]*=[ \t]*[0-9]+" = ["self.set_program_variable", 1, 3] # пока что необходимы пробелы рядом с символом =
 "CALL[ \t]+[a-zA-Z]+" = ["self.call_procedure", 1]
+
+[DOUBLE_KEYWORDS.openers]
+"REPEAT[ \t]+[0-9]+" = ["self.get_repeating_sequence", 1]
+
+[DOUBLE_KEYWORDS.closers]
+"REPEAT[ \t]+[0-9]+" = "ENDREPEAT"
+

@@ -12,6 +12,7 @@ class Interpreter:
         self.reload_config()
 
         self.single_keywords = self.__config["SINGLE_KEYWORDS"]
+        self.double_keywords = self.__config["DOUBLE_KEYWORDS"]
 
         self._program_variables = {}
         self._procedures = {}
@@ -31,17 +32,19 @@ class Interpreter:
             else:
                 return line_index, "Строка кода содержит синтаксические ошибки или отсутсвуют необходимые пробелы"
 
-            # double keyword checking
+        # double keyword checking
+        for line_index, line in enumerate(code):
+            pass
 
         logging.info("Код успешно интерперетирован и выполнен")
         return -1, "Код успешно выполнен"
 
     def _interpret_line(self, line: str, keyword_info: list) -> str | None:
-        import inspect
         line = line.split()
-        func = eval(keyword_info[0])
+        func = keyword_info[0]
         args = []
-        if inspect.ismethod(func):
+        if func[5:] in self.__dir__() and func.startswith("self."):
+            func = eval(func)
             for arg in keyword_info[1:]:
                 if type(arg) is str:
                     args.append(arg)
@@ -77,6 +80,9 @@ class Interpreter:
 
     def empty_func(self, *args) -> None:
         """Placeholder for interpreter config"""
+        pass
+
+    def add_program_call_to_buffer(self, data: str | list):
         pass
 
 
