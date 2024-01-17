@@ -1,3 +1,5 @@
+import sqlite3
+
 import PyQt5
 from PyQt5.QtCore import Qt
 
@@ -11,38 +13,47 @@ import sys
 def except_hook(cls, exception, traceback):
     sys.__excepthook__(cls, exception, traceback)
 
+
 class MyWidget(QMainWindow, Ui_Soft):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
         self.setWindowTitle('Собственный интерпретатор')
 
-        widget = Window_In_QTabWidget()
-        self.tabWidget.insertTab(self.tabWidget.count() - 1, widget, 'main')
+        widget = Window_In_QTabWidget('main', text)
+        self.tabWidget.insertTab(0, widget, 'main')
+        self.tabWidget.setCurrentIndex(0)
 
         self.tabWidget.tabBarClicked.connect(self.create_new_file)
-
-
 
     def create_new_file(self, index):
         if index == self.tabWidget.count() - 1:
             name, ok = QInputDialog.getText(self, "Create file", "Enter file name")
             if ok:
-                widget = Window_In_QTabWidget()
-                self.tabWidget.insertTab(self.tabWidget.count() - 1, widget, name)
-                print(name)
+                if name not in [self.tabWidget.tabText(i) for i in range(self.tabWidget.count())]:
+                    widget = Window_In_QTabWidget(name)
+                    self.tabWidget.insertTab(self.tabWidget.count() - 1, widget, name)
+
+                    con = sqlite3.connect("sql_bd.db")
+                    cur = con.cursor()
+                    cur.execute(f"""INSERT INTO files VALUES ({name}, '')""")
+                    con.commit()
+                    con.close()
+                    print(name)
+                else:
+                    print('Это имя уже есть')
             else:
                 print('Отмена создания файла')
                 self.tabWidget.setCurrentIndex(0)
-                pass    
+                pass
 
 
 class Window_In_QTabWidget(QWidget):
-    def __init__(self):
+    def __init__(self, name, text=''):
         super().__init__()
-        self.initUI()
+        self.initUI(name, text)
 
-    def initUI(self):
+    def initUI(self, name, text):
         layout = QHBoxLayout()
         self.numbers_lines = QPlainTextEdit()
         self.numbers_lines.setMaximumWidth(25)
@@ -52,11 +63,20 @@ class Window_In_QTabWidget(QWidget):
         layout.addWidget(self.numbers_lines)
         layout.addWidget(self.text)
         self.setLayout(layout)
+        self.name = name
 
         self.text.textChanged.connect(self.save_text_and_update_numbers)
 
     def save_text_and_update_numbers(self):
         self.numbers_lines.setPlainText('\n'.join(map(str, range(1, len(self.text.toPlainText().split('\n')) + 1))))
+        con = sqlite3.connect("sql_bd.db")
+        cur = con.cursor()
+        print(self.text.toPlainText(), self.name)
+        print(cur.execute('''SELECT name FROM files''').fetchall())
+        cur.execute(f"""UPDATE files
+                        SET content = {self.text.toPlainText()}
+                        WHERE name = {self.name}""")
+        con.commit()
 
 
 if __name__ == '__main__':

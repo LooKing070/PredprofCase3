@@ -12,4 +12,8 @@ cursor.execute('''CREATE TABLE files
                   (name TEXT,
                   content TEXT)''')
 conn.commit()
+con = sqlite3.connect("sql_bd.db")
+cur = con.cursor()
+cur.execute(f"""INSERT INTO files VALUES ('main', '')""")
+con.commit()
 conn.close()
