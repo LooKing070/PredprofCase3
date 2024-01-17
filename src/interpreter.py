@@ -24,19 +24,13 @@ class Interpreter:
 
         code = code.strip().split("\n")
         code = [line.upper() for line in code if line.strip()]
+
+        code = self.expand_blocks(code)
         for line_index, line in enumerate(code):
             # single keyword checking
             for mask in self.single_keywords:
                 if re.fullmatch(mask, line):
                     self._interpret_line(line, self.single_keywords[mask])
-
-
-        # double keyword checking
-        for line_index, line in enumerate(code):
-            for mask in self.double_keywords["openers"]:
-                print(mask, line)
-                if re.fullmatch(mask, line):
-                    self.get_code_block(code, line_index, mask, self.double_keywords["closers"][mask])
 
         logging.info("Код успешно интерперетирован и выполнен")
         return -1, "Код успешно выполнен"
@@ -70,12 +64,20 @@ class Interpreter:
         logging.warning(f"Попытка вызова процедуры {procedure_name}. Функция недоступна")
         self._error_buffer.append("Вызов процедур находится в разработке и не может быть выполнен")
 
-    def get_repeating_sequence(self, repetitions: int) -> list[str]:
-        pass
+    def expand_blocks(self, code: str) -> list[str]:
+        opening_stack = []
+        pairs = []
 
-    def get_code_block(self, code: list[str], start_index: int, opener_mask: str, closer_mask: str) -> None:
-        code = code[start_index:]
-        print(code)
+        for index, operator in enumerate(code):
+            if "IFBLOCK" in operator or "REPEAT" in operator or "PROCEDURE" in operator:
+                opening_stack.append((operator, index))
+            elif "ENDIF" in operator or "ENDREPEAT" in operator or "ENDPROC" in operator:
+                if opening_stack:
+                    opening_type, opening_index = opening_stack.pop()
+                    pairs.append((opening_index, index))
+        print(opening_stack)
+        print(pairs)
+        return []
 
     def reload_config(self) -> None:
         with open("interpreter_config.toml", "rb") as f:
