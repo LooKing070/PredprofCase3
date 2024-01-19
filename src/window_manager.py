@@ -4,7 +4,7 @@ from PyQt5.QtCore import Qt
 from designs.board_ui import Ui_Soft
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QVBoxLayout, QLabel, QLineEdit, QInputDialog, QWidget, \
-    QPlainTextEdit, QHBoxLayout
+    QPlainTextEdit, QHBoxLayout, QFileDialog
 import sys
 
 
@@ -27,9 +27,11 @@ class MyWidget(QMainWindow, Ui_Soft):
         con.close()
         self.tabWidget.setCurrentIndex(0)
 
-        self.tabWidget.tabBarClicked.connect(self.create_new_file)
+        self.tabWidget.tabBarClicked.connect(self.create_new_file_touch_plus)  # переключение вкладок, отслеживаем нажатие плюса
+        self.action_11.triggered.connect(self.create_new_file_up_menu)  # создать новый файл
+        self.action_13.triggered.connect(self.download_file_up_menu)  # создать новый файл
 
-    def create_new_file(self, index):
+    def create_new_file_touch_plus(self, index):
         if index == self.tabWidget.count() - 1:
             name, ok = QInputDialog.getText(self, "Create file", "Enter file name")
             if ok:
@@ -48,6 +50,45 @@ class MyWidget(QMainWindow, Ui_Soft):
                 print('Отмена создания файла')
                 self.tabWidget.setCurrentIndex(0)
                 pass
+
+    def create_new_file_up_menu(self):
+        name, ok = QInputDialog.getText(self, "Create file", "Enter file name")
+        if ok:
+            if name not in [self.tabWidget.tabText(i) for i in range(self.tabWidget.count())]:
+                widget = Window_In_QTabWidget(name)
+                self.tabWidget.insertTab(self.tabWidget.count() - 1, widget, name)
+
+                con = sqlite3.connect("sql_bd.db")
+                cur = con.cursor()
+                cur.execute(f"""INSERT INTO files VALUES ('{name}', '')""")
+                con.commit()
+                con.close()
+                self.tabWidget.setCurrentIndex(self.tabWidget.count() - 2)
+            else:
+                print('Это имя уже есть')
+
+    def download_file_up_menu(self):
+        file_name, _ = QFileDialog.getOpenFileName(self, 'Загрузить файл', '', 'Text Files (*.txt);;All Files (*)')
+        if file_name:
+            file_extension = file_name.split('.')
+            print(file_name, file_extension)
+            if file_extension[-1] == 'txt':
+                print(2)
+                if file_name[:-4] not in [self.tabWidget.tabText(i) for i in range(self.tabWidget.count())]:
+                    with open(file_name) as file:
+                        print(1)
+                        widget = Window_In_QTabWidget(file_name[:-4])
+                        self.tabWidget.insertTab(self.tabWidget.count() - 1, widget, file_name[:-4])
+
+                        con = sqlite3.connect("sql_bd.db")
+                        cur = con.cursor()
+                        cur.execute(f"""INSERT INTO files VALUES (?, ?)""", (file_name[:-4], file.read()))
+                        con.commit()
+                        con.close()
+
+                        self.tabWidget.setCurrentIndex(self.tabWidget.count() - 2)
+
+
 
     def level_builder(self, x_y, level_num="0", symbol="W"):  # строит уровень Длиной и шириной как задал игрок
         """for testItem in x_y.split():
@@ -100,10 +141,9 @@ class Window_In_QTabWidget(QWidget):
         self.numbers_lines.setPlainText('\n'.join(map(str, range(1, len(self.text.toPlainText().split('\n')) + 1))))
         con = sqlite3.connect("sql_bd.db")
         cur = con.cursor()
-        print(cur.execute('''SELECT * FROM files''').fetchall())
         cur.execute(f"""UPDATE files
-                        SET content = "`{self.text.toPlainText()}`"
-                        WHERE name = 'main'""")
+                        SET content = ?
+                        WHERE name = ?""", (self.text.toPlainText(), self.name))
         con.commit()
 
 
