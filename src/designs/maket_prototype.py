@@ -2,7 +2,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class Ui_Soft(object):
-    def setupUi(self, Soft):
+    def setupUi(self, Soft, GameWindow, level_structure, sectors):
         Soft.setObjectName("Soft")
         Soft.resize(1029, 800)
         self.centralWindow = QtWidgets.QWidget(Soft)
@@ -53,10 +53,54 @@ class Ui_Soft(object):
         self.stopButton.setObjectName("stopButton")
         self.horizontalLayout_4.addWidget(self.stopButton)
         self.verticalLayout.addWidget(self.buttonsSorter)
-        self.gridLayout = QtWidgets.QGridLayout()
+        self.playZone = QtWidgets.QWidget(self.windowManager)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Maximum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.playZone.sizePolicy().hasHeightForWidth())
+        self.playZone.setSizePolicy(sizePolicy)
+        self.playZone.setObjectName("playZone")
+        self.gridLayout = QtWidgets.QGridLayout(self.playZone)
+        self.gridLayout.setContentsMargins(0, 0, 0, 0)
         self.gridLayout.setSpacing(0)
         self.gridLayout.setObjectName("gridLayout")
-        self.verticalLayout.addLayout(self.gridLayout)
+        n_sector = 0
+        for n_string in range(len(level_structure)):
+            column = 0
+            for symbol in level_structure[n_string].rstrip():
+                n_se = sectors - n_sector
+                if symbol == "W":
+                    exec(f'self.wall{n_se} = QtWidgets.QLabel(self.playZone)')
+                    exec(f'self.wall{n_se}.setMaximumSize(QtCore.QSize(64, 64))')
+                    exec(f'self.wall{n_se}.setText("")')
+                    exec(f'self.wall{n_se}.setPixmap(QtGui.QPixmap("textures/PredInterpreterW.jpg"))')
+                    exec(f'self.wall{n_se}.setObjectName("wall{n_se}")')
+                    exec(f'self.gridLayout.addWidget(self.wall{n_se}, {n_string}, {column}, 1, 1)')
+                elif symbol == "G":
+                    exec(f'self.ground{n_se} = QtWidgets.QLabel(self.playZone)')
+                    exec(f'self.ground{n_se}.setMaximumSize(QtCore.QSize(64, 64))')
+                    exec(f'self.ground{n_se}.setText("")')
+                    exec(f'self.ground{n_se}.setPixmap(QtGui.QPixmap("textures/PredInterpreterG.jpg"))')
+                    exec(f'self.ground{n_se}.setObjectName("ground{n_se}")')
+                    exec(f'self.gridLayout.addWidget(self.ground{n_se}, {n_string}, {column}, 1, 1)')
+                else:
+                    if symbol == "F":
+                        exec(f'self.finish{n_se} = QtWidgets.QLabel(self.playZone)')
+                        exec(f'self.finish{n_se}.setMaximumSize(QtCore.QSize(64, 64))')
+                        exec(f'self.finish{n_se}.setText("")')
+                        exec(f'self.finish{n_se}.setPixmap(QtGui.QPixmap("textures/PredInterpreterF.jpg"))')
+                        exec(f'self.finish{n_se}.setObjectName("finish{n_se}")')
+                        exec(f'self.gridLayout.addWidget(self.finish{n_se}, {n_string}, {column}, 1, 1)')
+                    else:
+                        exec(f'self.troll{n_se} = QtWidgets.QLabel(self.playZone)')
+                        exec(f'self.troll{n_se}.setMaximumSize(QtCore.QSize(64, 64))')
+                        exec(f'self.troll{n_se}.setText("")')
+                        exec(f'self.troll{n_se}.setPixmap(QtGui.QPixmap("textures/PredInterpreterT.jpg"))')
+                        exec(f'self.troll{n_se}.setObjectName("troll{n_se}")')
+                        exec(f'self.gridLayout.addWidget(self.troll{n_se}, {n_string}, {column}, 1, 1)')
+                n_sector += 1
+                column += 1
+        self.verticalLayout.addWidget(self.playZone)
         self.plainTextEdit = QtWidgets.QPlainTextEdit(self.boardWigets)
         self.plainTextEdit.setMaximumSize(QtCore.QSize(16777215, 250))
         self.plainTextEdit.setObjectName("plainTextEdit")
