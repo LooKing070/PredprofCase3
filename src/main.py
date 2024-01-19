@@ -1,4 +1,7 @@
 import logging
+import PyQt5
+
+# self.settingsWindow.setWindowIcon(QIcon("../icons/AirBanIcon.jpg"))
 
 logging.basicConfig(filename="logs",
                     filemode='w',

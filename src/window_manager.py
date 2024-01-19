@@ -15,7 +15,7 @@ def except_hook(cls, exception, traceback):
 class MyWidget(QMainWindow, Ui_Soft):
     def __init__(self):
         super().__init__()
-        self.setupUi(self, QMainWindow, ["WGWG", "WGWG", "WWWG"], 12)
+        self.setupUi(self, QMainWindow, self.level_builder("21 21"), 21*21)
         self.setWindowTitle('Собственный интерпретатор')
 
         con = sqlite3.connect("sql_bd.db")
@@ -49,6 +49,31 @@ class MyWidget(QMainWindow, Ui_Soft):
                 self.tabWidget.setCurrentIndex(0)
                 pass
 
+    def level_builder(self, x_y, level_num="0", symbol="W"):  # строит уровень Длиной и шириной как задал игрок
+        """for testItem in x_y.split():
+            if not testItem.isdigit():
+                raise my_errors.IncorrectLevelBuildFormat"""
+        x, y = [int(p) for p in x_y.split()]
+        """if x % 2 == 0 or (x > 13 or y > 13) or (x < 3 or y < 3):
+            raise my_errors.IncorrectLevelBuildFormat"""
+        level = []
+        for field in range(1, y):
+            if field == 1:
+                level.append("{}{}{}{}".format(symbol * (x // 2), "F", symbol * (x // 2), "\n"))
+            elif field == (y - 1):
+                level.append("{}{}{}{}{}{}".format(symbol, "G" * (x // 2 - 1), "T", "G" * (x // 2 - 1), symbol, "\n"))
+            else:
+                level.append("{}{}{}{}".format(symbol, "G" * (x - 2), symbol, "\n"))
+        level.append(symbol * x)
+        return level
+        """with open(f"../data/level{level_num}/uroven.txt", "w") as li:
+            li.writelines(level)
+            with open(f"../data/level{level_num}/uroven.csv", "w", newline="", encoding="utf-8") as ls:
+                lines = {"x": f"{x}", "y": f"{y}", "field_walls": "0", "hummers": "5",
+                         "ban_time_range": "2500", "buttons_time": "2000", "ban_time": "300000"}
+                writer = csv.writer(ls, delimiter=';', quotechar='\n', quoting=csv.QUOTE_MINIMAL)
+                for k, v in lines.items():
+                    writer.writerow([k, v])"""
 
 class Window_In_QTabWidget(QWidget):
     def __init__(self, name, text=''):
