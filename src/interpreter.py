@@ -26,6 +26,7 @@ class Interpreter:
         code = [line.upper() for line in code if line.strip()]
 
         code = self.expand_blocks(code)
+        return 2 # TODO fix compatability
         for line_index, line in enumerate(code):
             # single keyword checking
             for mask in self.single_keywords:
@@ -64,7 +65,7 @@ class Interpreter:
         logging.warning(f"Попытка вызова процедуры {procedure_name}. Функция недоступна")
         self._error_buffer.append("Вызов процедур находится в разработке и не может быть выполнен")
 
-    def expand_blocks(self, code: str) -> list[str]:
+    def expand_blocks(self, code: list[str]) -> list[str]:
         def match_keyword(line: str) -> None:
             nonlocal loop_c, if_c, proc_c
             if line.startswith("REPEAT"):
@@ -81,25 +82,43 @@ class Interpreter:
                 proc_c -= 1
 
         opening_stack = []
-        pairs = []
         nests = 0
         loop_c = 0
         if_c = 0
         proc_c = 0
 
         for index, line in enumerate(code):
-            if any(re.fullmatch(mask, line) for mask in self.__config["DOUBLE_KEYWORDS"]["openers"]):
+            if any(re.fullmatch(mask, line) for mask in self.__config["DOUBLE_KEYWORDS"]):
                 nests += 1
                 if nests > 3:
                     print("Too many nestings")
-            if any(re.fullmatch(mask, line) for mask in self.__config["DOUBLE_KEYWORDS"]["closers"].values()):
+                opening_stack.append(index)
+            if any(re.fullmatch(mask, line) for mask in self.__config["DOUBLE_KEYWORDS"].values()):
                 nests -= 1
                 if nests < 0:
                     print("Wrong closer count")
-            
-        if nests != 0:
-            print("Wrong closer count")
-        return []
+                for element in opening_stack[::-1]:
+                    for mask in self.__config["DOUBLE_KEYWORDS"]:
+                        if re.fullmatch(mask, code[element]) and re.fullmatch(
+                                self.__config["DOUBLE_KEYWORDS"][mask], line):
+                            opening_stack.pop()
+                            break
+                    code_block = code[element: index+1]
+                    code[element: index+1] = self.decode_block(code_block)
+
+        for var in [nests, loop_c, if_c, proc_c]:
+            if var != 0:
+                print("Wrong closer count")
+        return [code]
+
+    def decode_block(self, code_block: list[str]):
+        if code_block[0].startswith("REPEAT"): # TODO fix
+            return code_block[1:-1] * int(code_block[0].split()[1])
+        if code_block[0].startswith("PROCEDURE"):
+            self._procedures[code_block[0].split()[1]] = code_block[1:]
+            return []
+        if code_block[0].startswith("IFBLOCK"):
+            self._procedures[code_block[0].split()[1]] = code_block[1:]
 
     def reload_config(self) -> None:
         with open("interpreter_config.toml", "rb") as f:
@@ -140,12 +159,24 @@ if __name__ == "__main__":
                         level=logging.DEBUG)
     interp = Interpreter()
     error_code = interp.parse_code('''
-LEFT 1
+LEFT 99999
 SET N = 3
 REPEAT 3
-LEFT 2
+    LEFT 2
+    LEFT 3
+    REPEAT 2
+        RIGHT 200
+        REPEAT 2
+            PROCEDURE N
+                LEFT 2
+            ENDPROC
+        RIGHT 200
+    ENDREPEAT
+
+LEFT 4
+LEFT 5
 ENDREPEAT
-ENDREPEAT
+LEFT 9999
     ''')
     # interp._procedures["N"] = 2
     # interp.check_names()
