@@ -1,8 +1,6 @@
 import sqlite3
-
 import PyQt5
 from PyQt5.QtCore import Qt
-
 from designs.board_ui import Ui_Soft
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QVBoxLayout, QLabel, QLineEdit, QInputDialog, QWidget, \
@@ -20,11 +18,9 @@ class MyWidget(QMainWindow, Ui_Soft):
         self.setupUi(self, QMainWindow, ["WGWG", "WGWG", "WWWG"], 12)
         self.setWindowTitle('Собственный интерпретатор')
 
-
         con = sqlite3.connect("sql_bd.db")
         cur = con.cursor()
         for lst in cur.execute('''SELECT * FROM files''').fetchall():
-
             widget = Window_In_QTabWidget(lst[0], lst[1])
             self.tabWidget.insertTab(self.tabWidget.count() - 1, widget, lst[0])
         con.commit()
@@ -79,9 +75,10 @@ class Window_In_QTabWidget(QWidget):
         self.numbers_lines.setPlainText('\n'.join(map(str, range(1, len(self.text.toPlainText().split('\n')) + 1))))
         con = sqlite3.connect("sql_bd.db")
         cur = con.cursor()
+        print(cur.execute('''SELECT * FROM files''').fetchall())
         cur.execute(f"""UPDATE files
-                        SET content = '{self.text.toPlainText()}'
-                        WHERE name = '{self.name}'""")
+                        SET content = "`{self.text.toPlainText()}`"
+                        WHERE name = 'main'""")
         con.commit()
 
 

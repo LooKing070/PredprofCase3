@@ -184,22 +184,27 @@
     <property name="title">
      <string>Файл</string>
     </property>
-    <addaction name="action_7"/>
     <addaction name="separator"/>
-    <addaction name="action_9"/>
+    <addaction name="action_2"/>
     <addaction name="separator"/>
-    <addaction name="action_11"/>
+    <addaction name="action_3"/>
+    <addaction name="separator"/>
+    <addaction name="action_6"/>
+    <addaction name="separator"/>
+    <addaction name="action_8"/>
     <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menu_2">
     <property name="title">
      <string>Настройки</string>
     </property>
+    <addaction name="separator"/>
     <addaction name="action_13"/>
     <addaction name="separator"/>
     <addaction name="action_15"/>
     <addaction name="separator"/>
     <addaction name="action_17"/>
+    <addaction name="separator"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menu_2"/>
@@ -247,6 +252,26 @@
   <action name="action_17">
    <property name="text">
     <string>Язык</string>
+   </property>
+  </action>
+  <action name="action_2">
+   <property name="text">
+    <string>Создать</string>
+   </property>
+  </action>
+  <action name="action_3">
+   <property name="text">
+    <string>Открыть</string>
+   </property>
+  </action>
+  <action name="action_6">
+   <property name="text">
+    <string>Сохранить как</string>
+   </property>
+  </action>
+  <action name="action_8">
+   <property name="text">
+    <string>Удалить</string>
    </property>
   </action>
  </widget>
