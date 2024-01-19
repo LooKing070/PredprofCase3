@@ -9,11 +9,11 @@
 
 [DOUBLE_KEYWORDS.openers]
 "REPEAT[ \t]+[0-9]+" = ["self.get_repeating_sequence", 1]
-"(IFBLOCK)[ \t]+(LEFT|RIGHT|UP|DOWN)" = ["local", "emptyfunc"]
-"REPEAT [1-9][0-9]* \n.*\n ENDREPEAT" = ["local", "emptyfunc"]
-"PROCEDURE [a-zA-Z]+ \n.*\n ENDPROC" = ["local", "emptyfunc"]
+"(IFBLOCK)[ \t]+(LEFT|RIGHT|UP|DOWN)" = ["self.emptyfunc", 1]
+"PROCEDURE [a-zA-Z]+ \n.*\n ENDPROC" = ["self.emptyfunc", 1]
 
 
 [DOUBLE_KEYWORDS.closers]
 "REPEAT[ \t]+[0-9]+" = "ENDREPEAT"
-
+"(IFBLOCK)[ \t]+(LEFT|RIGHT|UP|DOWN)" = "ENDIF"
+"PROCEDURE [a-zA-Z]+ \n.*\n ENDPROC" = "ENDPROC"

@@ -65,18 +65,40 @@ class Interpreter:
         self._error_buffer.append("Вызов процедур находится в разработке и не может быть выполнен")
 
     def expand_blocks(self, code: str) -> list[str]:
+        def match_keyword(line: str) -> None:
+            nonlocal loop_c, if_c, proc_c
+            if line.startswith("REPEAT"):
+                loop_c += 1
+            if line.startswith("IFBLOCK"):
+                if_c += 1
+            if line.startswith("PROCEDURE"):
+                proc_c += 1
+            if line.startswith("ENDREPEAT"):
+                loop_c -= 1
+            if line.startswith("ENDIF"):
+                if_c -= 1
+            if line.startswith("ENDPROC"):
+                proc_c -= 1
+
         opening_stack = []
         pairs = []
+        nests = 0
+        loop_c = 0
+        if_c = 0
+        proc_c = 0
 
-        for index, operator in enumerate(code):
-            if "IFBLOCK" in operator or "REPEAT" in operator or "PROCEDURE" in operator:
-                opening_stack.append((operator, index))
-            elif "ENDIF" in operator or "ENDREPEAT" in operator or "ENDPROC" in operator:
-                if opening_stack:
-                    opening_type, opening_index = opening_stack.pop()
-                    pairs.append((opening_index, index))
-        print(opening_stack)
-        print(pairs)
+        for index, line in enumerate(code):
+            if any(re.fullmatch(mask, line) for mask in self.__config["DOUBLE_KEYWORDS"]["openers"]):
+                nests += 1
+                if nests > 3:
+                    print("Too many nestings")
+            if any(re.fullmatch(mask, line) for mask in self.__config["DOUBLE_KEYWORDS"]["closers"].values()):
+                nests -= 1
+                if nests < 0:
+                    print("Wrong closer count")
+            
+        if nests != 0:
+            print("Wrong closer count")
         return []
 
     def reload_config(self) -> None:
@@ -122,6 +144,7 @@ LEFT 1
 SET N = 3
 REPEAT 3
 LEFT 2
+ENDREPEAT
 ENDREPEAT
     ''')
     # interp._procedures["N"] = 2
