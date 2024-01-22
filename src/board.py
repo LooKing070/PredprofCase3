@@ -9,16 +9,12 @@ from random import randint
 class GameLogic(QWidget, Ui_GameWindow):
     def __init__(self, level, parent=None):
         super(GameLogic, self).__init__(parent)
-        with open(f"../data/level{level}/uroven.csv", "r") as levelStatsFile:
-            self.levelStats = dict(csv.reader(levelStatsFile, delimiter=";", quotechar="\n"))
-        with open(f"../data/level{level}/uroven.txt", "r") as u:
+        with open(f"levels/structure{level}.txt", "r") as u:
             levelStructure = u.readlines()
         # таймеры
-        self.stopTimer = QTimer()
         self.looseTimer, self.animationTimer = QTimer(), QTimer()
         self.animationTimer.setInterval(1000)
-        self.looseTimer.setInterval(int(self.levelStats["ban_time"]))
-        self.stopTimer.setInterval(int(self.levelStats["buttons_time"]) // 2)
+        self.looseTimer.setInterval(10000000000)
         self.looseTimer.timeout.connect(self.loose)
         self.animationTimer.timeout.connect(lambda: self.animan("exitButton"))
         self.looseTimer.start()
@@ -27,14 +23,7 @@ class GameLogic(QWidget, Ui_GameWindow):
         self.gameResult = ResultWidget("no result", parent=self)
         self.trollPosition = [int(self.levelStats["x"]) // 2, int(self.levelStats["y"]) - 2]
         self.levelStructure = [[j for j in i.rstrip()] for i in levelStructure]
-        self.playUi(self, levelStructure, int(self.levelStats["x"]) * int(self.levelStats["y"]))
         self.troll = self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0])
-        # кнопки действий
-        self.exitButton_2.clicked.connect(self.loose)
-        self.upButton.clicked.connect(self.troll_move)
-        self.downButton.clicked.connect(self.troll_move)
-        self.rightButton.clicked.connect(self.troll_move)
-        self.leftButton.clicked.connect(self.troll_move)
 
     def troll_move(self):  # куда пойдёт игрок
         if self.sender().text() == "UP":
@@ -93,14 +82,6 @@ class GameLogic(QWidget, Ui_GameWindow):
             self.stopTimer.timeout.connect(lambda: self.troll_stop(True))
             self.stopTimer.start()
 
-    def trolling_buttons(self):  # меняет кнопки местами
-        self.troll_stop(False)
-        moveButtons = ["🠗", "🠖", "🠔", "🠕"]
-        self.upButton.setText(moveButtons.pop(randint(0, len(moveButtons) - 1)))
-        self.downButton.setText(moveButtons.pop(randint(0, len(moveButtons) - 1)))
-        self.leftButton.setText(moveButtons.pop(randint(0, len(moveButtons) - 1)))
-        self.rightButton.setText(moveButtons.pop(randint(0, len(moveButtons) - 1)))
-
     def ban_hummer(self):  # клетки, на которые нельзя наступать
         for sector in self.hummers:
             if self.levelStructure[sector[1]][sector[0]] != "T":
@@ -123,37 +104,20 @@ class GameLogic(QWidget, Ui_GameWindow):
             self.animationTimer.stop()
             self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]).widget().raise_()
             self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]) \
-                .widget().setPixmap(QPixmap("../grafika/AirBanTexTB.jpg"))
-            self.playerState.setPixmap(QPixmap("../grafika/AirBanTexTDed.jpg"))
+                .widget().setPixmap(QPixmap("textures/PredInterpreterX.jpg"))
+            self.playerState.setPixmap(QPixmap("textures/PredInterpreterF.jpg"))
 
-    def win(self):
-        self.looseTimer.stop()
-        self.hummerTimer.stop()
-        self.buttonsTimer.stop()
+    def run_result(self, result):
         self.animationTimer.stop()
-        self.upButton.hide(), self.downButton.hide()
-        self.leftButton.hide(), self.rightButton.hide()
-        self.exitButton_2.hide()
-        self.gameResult = ResultWidget("you escaped", parent=self)
-        self.gameResult.show()
-        return True
-
-    def loose(self):
-        self.looseTimer.stop()
-        self.hummerTimer.stop()
-        self.buttonsTimer.stop()
-        self.animationTimer.stop()
-        self.downButton.hide(), self.upButton.hide()
-        self.leftButton.hide(), self.rightButton.hide()
-        self.exitButton_2.hide()
-        self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]).widget().raise_()
-        self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]) \
-            .widget().setPixmap(QPixmap("../grafika/AirBanTexTX.jpg"))
-        self.animationTimer.timeout.connect(lambda: self.animan("loose"))
-        self.animationTimer.start()
-        self.gameResult = ResultWidget("you banned", parent=self)
-        self.gameResult.show()
-        return True
+        if result:
+            return "you escaped"
+        else:
+            self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]).widget().raise_()
+            self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]) \
+                .widget().setPixmap(QPixmap("textures/PredInterpreterX.jpg"))
+            self.animationTimer.timeout.connect(lambda: self.animan("loose"))
+            self.animationTimer.start()
+            return "you banned"
 
     def game_state(self, state):
         if state == "end":
