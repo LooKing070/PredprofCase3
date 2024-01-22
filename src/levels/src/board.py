@@ -2,12 +2,11 @@ import csv
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import QTimer
-from designs.maket_prototype import Ui_Soft
 from random import randint
 
 
-class GameLogic(QWidget, Ui_Soft):
-    def __init__(self, level, parent=None):
+class GameLogic(QWidget):
+    def __init__(self, ui, level, parent=None):
         super(GameLogic, self).__init__(parent)
         with open(f"levels/structure{level}.txt", "r") as u:
             levelStructure = u.readlines()
@@ -20,7 +19,7 @@ class GameLogic(QWidget, Ui_Soft):
         self.looseTimer.start()
         self.animationTimer.start()
         # геймплейные параметры
-        self.gridLayout = Ui_Soft().gridLayout()
+        self.gridLayout = ui
         self.trollPosition = [21 // 2, 21 - 2]
         self.levelStructure = [[j for j in i.rstrip()] for i in levelStructure]
         self.troll = self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0])
@@ -123,30 +122,4 @@ class GameLogic(QWidget, Ui_Soft):
             self.parent().end_game()
         elif state == "return":
             self.parent().start_game()
-
-    def level_builder(self, x_y, level_num="0", symbol="W"):  # строит уровень Длиной и шириной как задал игрок
-        """for testItem in x_y.split():
-            if not testItem.isdigit():
-                raise my_errors.IncorrectLevelBuildFormat"""
-        x, y = [int(p) for p in x_y.split()]
-        """if x % 2 == 0 or (x > 13 or y > 13) or (x < 3 or y < 3):
-            raise my_errors.IncorrectLevelBuildFormat"""
-        level = []
-        for field in range(1, y):
-            if field == 1:
-                level.append("{}{}{}{}".format(symbol * (x // 2), "F", symbol * (x // 2), "\n"))
-            elif field == (y - 1):
-                level.append("{}{}{}{}{}{}".format(symbol, "G" * (x // 2 - 1), "T", "G" * (x // 2 - 1), symbol, "\n"))
-            else:
-                level.append("{}{}{}{}".format(symbol, "G" * (x - 2), symbol, "\n"))
-        level.append(symbol * x)
-        """with open(f"../data/level{level_num}/uroven.txt", "w") as li:
-            li.writelines(level)
-            with open(f"../data/level{level_num}/uroven.csv", "w", newline="", encoding="utf-8") as ls:
-                lines = {"x": f"{x}", "y": f"{y}", "field_walls": "0", "hummers": "5",
-                         "ban_time_range": "2500", "buttons_time": "2000", "ban_time": "300000"}
-                writer = csv.writer(ls, delimiter=';', quotechar='\n', quoting=csv.QUOTE_MINIMAL)
-                for k, v in lines.items():
-                    writer.writerow([k, v])"""
-        return level
 
