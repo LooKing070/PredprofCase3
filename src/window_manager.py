@@ -18,8 +18,7 @@ class MyWidget(QMainWindow, Ui_Soft):
         self.setupUi(self, QMainWindow, self.level_builder("21 21"), 21 * 21)
         self.setWindowTitle('Собственный интерпретатор')
         self.orogin_palete = self.palette()
-        self.set_black_tema()
-        self.set_white_tema()
+        self.tema = 'white'
 
         con = sqlite3.connect("sql_bd.db")
         cur = con.cursor()
@@ -36,6 +35,7 @@ class MyWidget(QMainWindow, Ui_Soft):
         self.action_3.triggered.connect(self.download_file_up_menu)  # загрузить txt файл
         self.action_6.triggered.connect(self.save_file_up_menu)  # загрузить txt файл
         self.action_8.triggered.connect(self.delete_file_up_menu)  # удалить файл из приложения
+        self.action_13.triggered.connect(self.update_tema_up_menu)  # удалить файл из приложения
 
 
     def create_new_file_touch_plus(self, index):
@@ -124,6 +124,19 @@ class MyWidget(QMainWindow, Ui_Soft):
             cur.execute(f"""DELETE FROM files WHERE name = ?""", (name, ))
             con.commit()
             con.close()
+
+    def update_tema_up_menu(self):
+        message_box = QMessageBox()
+        message_box.setText("Вы точно хотите сменить тему?")
+        message_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        result = message_box.exec()
+        if result == QMessageBox.Yes:
+            if self.tema == 'white':
+                self.set_black_tema()
+                self.tema = 'black'
+            elif self.tema == 'black':
+                self.set_white_tema()
+                self.tema = 'white'
 
     def set_white_tema(self):
         self.setPalette(self.orogin_palete)
