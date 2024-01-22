@@ -108,6 +108,7 @@ class MyWidget(QMainWindow, Ui_Soft):
                     f.write(self.tabWidget.widget(self.tabWidget.currentIndex()).text.toPlainText())
 
     def delete_file_up_menu(self):  # сохранение теории в файл
+
         if self.tabWidget.tabText(self.tabWidget.currentIndex()) == '+':
             return
         print(1)
