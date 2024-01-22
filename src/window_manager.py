@@ -2,9 +2,9 @@ import sqlite3
 import PyQt5
 from PyQt5.QtCore import Qt
 from designs.maket_prototype import Ui_Soft
-from PyQt5 import QtCore, QtGui
+from PyQt5 import QtCore
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QVBoxLayout, QLabel, QLineEdit, QInputDialog, QWidget, \
-    QPlainTextEdit, QHBoxLayout, QFileDialog, QMessageBox
+    QPlainTextEdit, QHBoxLayout, QFileDialog
 import sys
 
 
@@ -15,50 +15,7 @@ def except_hook(cls, exception, traceback):
 class MyWidget(QMainWindow, Ui_Soft):
     def __init__(self):
         super().__init__()
-
-        palette = QtGui.QPalette()
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
-        brush.setStyle(QtCore.Qt.SolidPattern)
-        palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.Base, brush)
-        brush = QtGui.QBrush(QtGui.QColor(239, 239, 239))
-        brush.setStyle(QtCore.Qt.SolidPattern)
-        palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.Window, brush)
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
-        brush.setStyle(QtCore.Qt.SolidPattern)
-        palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.Base, brush)
-        brush = QtGui.QBrush(QtGui.QColor(239, 239, 239))
-        brush.setStyle(QtCore.Qt.SolidPattern)
-        palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.Window, brush)
-        brush = QtGui.QBrush(QtGui.QColor(239, 239, 239))
-        brush.setStyle(QtCore.Qt.SolidPattern)
-        palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Base, brush)
-        brush = QtGui.QBrush(QtGui.QColor(239, 239, 239))
-        brush.setStyle(QtCore.Qt.SolidPattern)
-        palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Window, brush)
-        self.setPalette(palette)
-
-        palette = QtGui.QPalette()
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
-        brush.setStyle(QtCore.Qt.SolidPattern)
-        palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.Base, brush)
-        brush = QtGui.QBrush(QtGui.QColor(42, 42, 42))
-        brush.setStyle(QtCore.Qt.SolidPattern)
-        palette.setBrush(QtGui.QPalette.Active, QtGui.QPalette.Window, brush)
-        brush = QtGui.QBrush(QtGui.QColor(255, 255, 255))
-        brush.setStyle(QtCore.Qt.SolidPattern)
-        palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.Base, brush)
-        brush = QtGui.QBrush(QtGui.QColor(42, 42, 42))
-        brush.setStyle(QtCore.Qt.SolidPattern)
-        palette.setBrush(QtGui.QPalette.Inactive, QtGui.QPalette.Window, brush)
-        brush = QtGui.QBrush(QtGui.QColor(42, 42, 42))
-        brush.setStyle(QtCore.Qt.SolidPattern)
-        palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Base, brush)
-        brush = QtGui.QBrush(QtGui.QColor(42, 42, 42))
-        brush.setStyle(QtCore.Qt.SolidPattern)
-        palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Window, brush)
-        self.setPalette(palette)
-
-        self.setupUi(self, QMainWindow, self.level_builder("21 21"), 21 * 21)
+        self.setupUi(self, QMainWindow, self.level_builder("21 21"), 21*21)
         self.setWindowTitle('Собственный интерпретатор')
 
         con = sqlite3.connect("sql_bd.db")
@@ -70,13 +27,9 @@ class MyWidget(QMainWindow, Ui_Soft):
         con.close()
         self.tabWidget.setCurrentIndex(0)
 
-        self.tabWidget.tabBarClicked.connect(
-            self.create_new_file_touch_plus)  # переключение вкладок, отслеживаем нажатие плюса
-        self.action_2.triggered.connect(self.create_new_file_up_menu)  # создать новый файл
-        self.action_3.triggered.connect(self.download_file_up_menu)  # загрузить txt файл
-        self.action_6.triggered.connect(self.save_file_up_menu)  # загрузить txt файл
-        self.action_8.triggered.connect(self.delete_file_up_menu)  # удалить файл из приложения
-
+        self.tabWidget.tabBarClicked.connect(self.create_new_file_touch_plus)  # переключение вкладок, отслеживаем нажатие плюса
+        self.action_11.triggered.connect(self.create_new_file_up_menu)  # создать новый файл
+        self.action_13.triggered.connect(self.download_file_up_menu)  # создать новый файл
 
     def create_new_file_touch_plus(self, index):
         if index == self.tabWidget.count() - 1:
@@ -115,54 +68,26 @@ class MyWidget(QMainWindow, Ui_Soft):
                 print('Это имя уже есть')
 
     def download_file_up_menu(self):
-        file_name, _ = QFileDialog.getOpenFileName(self, 'Загрузить файл', '', 'Text Files (*.txt);;')
+        file_name, _ = QFileDialog.getOpenFileName(self, 'Загрузить файл', '', 'Text Files (*.txt);;All Files (*)')
         if file_name:
             file_extension = file_name.split('.')
             print(file_name, file_extension)
             if file_extension[-1] == 'txt':
                 print(2)
-                if file_extension[0].split('/')[-1] not in [self.tabWidget.tabText(i) for i in
-                                                            range(self.tabWidget.count())]:
+                if file_name[:-4] not in [self.tabWidget.tabText(i) for i in range(self.tabWidget.count())]:
                     with open(file_name) as file:
-                        text = file.read()
-                        widget = Window_In_QTabWidget(file_extension[0].split('/')[-1], text)
-                        self.tabWidget.insertTab(self.tabWidget.count() - 1, widget, file_extension[0].split('/')[-1])
+                        print(1)
+                        widget = Window_In_QTabWidget(file_name[:-4])
+                        self.tabWidget.insertTab(self.tabWidget.count() - 1, widget, file_name[:-4])
+
                         con = sqlite3.connect("sql_bd.db")
                         cur = con.cursor()
-                        cur.execute(f"""INSERT INTO files VALUES (?, ?)""", (file_extension[0].split('/')[-1], text))
+                        cur.execute(f"""INSERT INTO files VALUES (?, ?)""", (file_name[:-4], file.read()))
                         con.commit()
                         con.close()
+
                         self.tabWidget.setCurrentIndex(self.tabWidget.count() - 2)
 
-    def save_file_up_menu(self):  # сохранение теории в файл
-        if self.tabWidget.tabText(self.tabWidget.currentIndex()) == '+':
-            return
-        options = QFileDialog.Options()
-        options |= QFileDialog.ReadOnly
-
-        file, style = QFileDialog.getSaveFileName(QDialog(), "Сохранить файл", self.tabWidget.widget(self.tabWidget.currentIndex()).name,
-                                                  "Текстовый файл (*.txt)", options=options)
-        if file:
-            if style == "Текстовый файл (*.txt)":
-                with open(file.rstrip('.txt') + '.txt', 'w') as f:
-                    f.write(self.tabWidget.widget(self.tabWidget.currentIndex()).text.toPlainText())
-
-    def delete_file_up_menu(self):  # сохранение теории в файл
-        if self.tabWidget.tabText(self.tabWidget.currentIndex()) == '+':
-            return
-        print(1)
-        message_box = QMessageBox()
-        message_box.setText("Вы точно хотите удалить файл?")
-        message_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        result = message_box.exec()
-        if result == QMessageBox.Yes:
-            name = self.tabWidget.tabText(self.tabWidget.currentIndex())
-            self.tabWidget.removeTab(self.tabWidget.currentIndex())
-            con = sqlite3.connect("sql_bd.db")
-            cur = con.cursor()
-            cur.execute(f"""DELETE FROM files WHERE name = ?""", (name, ))
-            con.commit()
-            con.close()
 
 
     def level_builder(self, x_y, level_num="0", symbol="W"):  # строит уровень Длиной и шириной как задал игрок
@@ -181,6 +106,7 @@ class MyWidget(QMainWindow, Ui_Soft):
             else:
                 level.append("{}{}{}{}".format(symbol, "G" * (x - 2), symbol, "\n"))
         level.append(symbol * x)
+        return level
         """with open(f"../data/level{level_num}/uroven.txt", "w") as li:
             li.writelines(level)
             with open(f"../data/level{level_num}/uroven.csv", "w", newline="", encoding="utf-8") as ls:
@@ -189,9 +115,6 @@ class MyWidget(QMainWindow, Ui_Soft):
                 writer = csv.writer(ls, delimiter=';', quotechar='\n', quoting=csv.QUOTE_MINIMAL)
                 for k, v in lines.items():
                     writer.writerow([k, v])"""
-        return level
-
-
 
 class Window_In_QTabWidget(QWidget):
     def __init__(self, name, text=''):
