@@ -1,9 +1,12 @@
 import re
-from typing import List
+# TODO добавить ошибки при парсинге строки кода
+# TODO добавить использование переменных
+# TODO запуск действий игрока
 
 
 class Interpreter:
     def __init__(self):
+        # Переменные программы
         self._procedures = {}
         self._variables = {}
 
@@ -11,34 +14,29 @@ class Interpreter:
         self.reload_config()
 
     def parse_code(self, code: list[str]) -> tuple[int, str] | None:
-        outside_lines1 = []
-        outside_lines2 = []
-        t = 0
-
+        if not any(line.strip() for line in code):
+            return -1, "Код отсутствует"
         stack = []
+        block_pairs = []
+        # Нахождение парных блоков
         for index, line in enumerate(code):
+            # Поиск открывающего блока
             for mask in self.__config["DOUBLE_KEYWORDS"].keys():
                 if re.fullmatch(mask, line):
                     stack.append((index, mask))
                     break
-            else:
-                if stack:
-                    t = 1
-                if t == 0:
-                    outside_lines1.append(line)
-                else:
-                    outside_lines2.append(line)
 
+            # Проверка уровне вложенности кода
             if len(stack) > 3:
                 return index, "Превышен максимальный уровень вложенности"
 
+            # Поиск закрывающего блока
             for mask in self.__config["DOUBLE_KEYWORDS"].values():
                 if re.fullmatch(mask, line):
-                    for stack_index, opener in list(enumerate(stack[::1]))[::-1]:
+                    for stack_index, opener in list(enumerate(stack))[::-1]:
                         if self.__config["DOUBLE_KEYWORDS"][opener[1]] == mask:
-                            code_block = code[opener[0]:index + 1]
                             del stack[stack_index]
-                            code[opener[0]:index + 1] = self._decode_block(code_block)
+                            block_pairs.append((opener, index))
                             break
                     else:
                         return index, "Отсутствует открывающий блок или указан неверный закрывающий блок"
@@ -46,6 +44,36 @@ class Interpreter:
 
         if stack:
             return -1, "Неверное количество закрывающих блоков"
+
+        for i in range(len(block_pairs)):
+            block_pairs[i] = [block_pairs[i][0][0], block_pairs[i][1]]
+
+        # block_pairs.sort(key=lambda pair: pair[1]-pair[0])
+        def open_pairs(pairs: list[list[int, int]]) -> None:
+            nonlocal code
+            pair = pairs[0]
+            code_block = code[pair[0]:pair[1] + 1]
+            decoded_block = self._decode_block(code_block)
+            code[pair[0]: pair[1] + 1] = decoded_block
+            length_difference = len(decoded_block) - len(code_block)
+            for mod_pair in pairs[1:]:
+                if mod_pair[0] > pair[0]:
+                    mod_pair[0] += length_difference
+                if mod_pair[1] > pair[0]:
+                    mod_pair[1] += length_difference
+            try:
+                open_pairs(pairs[1:])
+            except IndexError:
+                pass
+
+        open_pairs(block_pairs)
+
+        for index, line in enumerate(code):
+            error_code = self._parse_line(line)
+
+        if error_code:
+            return -1, error_code
+
         return -1, "Код успешно выполнен"
 
     def _parse_line(self, line) -> str | None:
@@ -65,12 +93,12 @@ class Interpreter:
         else:
             if "self" in line:
                 exec(line)
-            elif any(1 for mask in self.__config["DOUBLE_KEYWORDS"].keys() if re.fullmatch(mask, line) or re.fullmatch(self.__config["DOUBLE_KEYWORDS"][mask], line)):
+            elif any(1 for mask in self.__config["DOUBLE_KEYWORDS"].keys() if
+                     re.fullmatch(mask, line) or re.fullmatch(self.__config["DOUBLE_KEYWORDS"][mask], line)):
                 pass
             else:
                 if line.strip():
                     return "Указано неверное ключевое слово"
-
 
     def _decode_block(self, code_block: list[str]) -> list[str]:
         if code_block[0].strip().startswith("REPEAT"):
@@ -93,14 +121,21 @@ class Interpreter:
         self._variables[name] = value
 
     def do_if(self, direction, *code):
-        pass
+        print(f"Выполняем код если свобона клетка {direction}")
+
+    def call_procedure(self, procedure_name):
+        if procedure_name in self._procedures.keys():
+            self.parse_code(self._procedures[procedure_name])
+        else:
+            print("Попытка вызова несуществующей функции")
+
 
 
 if __name__ == "__main__":
     interp = Interpreter()
     error_code = interp.parse_code('''
 LEFT 99999
-SET N = 3
+SET N=3
 PROCEDURE N
     LEFT 2
     RIGHT 2
@@ -110,6 +145,8 @@ REPEAT 2
     LEFT 3
     IFBLOCK LEFT
         LEFT 999
+        RIGHT 998
+        UP 1
     ENDIF
     LEFT 4
     LEFT 5
