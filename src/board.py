@@ -15,7 +15,7 @@ class GameLogic(QWidget):
         self.animationTimer.setInterval(1000)
         self.looseTimer.setInterval(1000000)
         self.looseTimer.timeout.connect(lambda: self.run_result(False))
-        self.animationTimer.timeout.connect(lambda: self.animan("exitButton"))
+        # self.animationTimer.timeout.connect(lambda: self.animan("exitButton"))
         self.looseTimer.start()
         self.animationTimer.start()
         # геймплейные параметры
