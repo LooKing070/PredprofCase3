@@ -6,8 +6,8 @@ from random import randint
 
 
 class GameLogic(QWidget):
-    def __init__(self, ui, level, parent=None):
-        super(GameLogic, self).__init__(parent)
+    def __init__(self, ui, level):
+        super(GameLogic, self).__init__()
         with open(f"levels/structure{level}.txt", "r") as u:
             levelStructure = u.readlines()
         # таймеры
@@ -117,9 +117,11 @@ class GameLogic(QWidget):
         self.animationTimer.start()
         return "you banned"
 
-    def game_state(self, state):
-        if state == "end":
-            self.parent().end_game()
-        elif state == "return":
-            self.parent().start_game()
+    def run_state(self, state="run", commands=("RIGHT", "UP")):
+        if state == "run":
+            for command in commands:
+                self.troll_move(command)
+                print(self.trollPosition)
+        elif state == "stop":
+            self.run_result(False)
 

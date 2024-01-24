@@ -13,6 +13,7 @@ class MyWidget(QMainWindow, Ui_Soft):
         super().__init__()
         self.setupUi(self, QMainWindow, level_builder("21 21"), 21 * 21)
         self.baseWindow = GameLogic(self.gridLayout, 0)
+
         self.setWindowTitle('Собственный интерпретатор')
         self.orogin_palete = self.palette()
         self.tema = 'white'
@@ -26,7 +27,7 @@ class MyWidget(QMainWindow, Ui_Soft):
             self.tabWidget.insertTab(self.tabWidget.count() - 1, widget, lst[0])
         con.commit()
         con.close()
-
+        self.runButton.clicked.connect(self.baseWindow.run_state())
         self.tabWidget.setCurrentIndex(0)
 
         self.tabWidget.tabBarClicked.connect(
