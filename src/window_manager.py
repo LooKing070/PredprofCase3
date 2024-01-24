@@ -17,7 +17,7 @@ class MyWidget(QMainWindow, Ui_Soft):
     def __init__(self):
         super().__init__()
         self.setupUi(self, QMainWindow, self.level_builder("21 21"), 21 * 21)
-        self.baseWindow = GameLogic(self.playZone, 0)
+        self.baseWindow = GameLogic(self.gridLayout, 0)
         self.setWindowTitle('Собственный интерпретатор')
         self.orogin_palete = self.palette()
         self.tema = 'white'

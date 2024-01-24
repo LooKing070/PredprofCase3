@@ -189,3 +189,4 @@ class Ui_Soft(object):
         self.action_3.setText(_translate("Soft", "Открыть"))
         self.action_6.setText(_translate("Soft", "Сохранить как"))
         self.action_8.setText(_translate("Soft", "Удалить"))
+
