@@ -2,26 +2,25 @@ import csv
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import QTimer
-from designs.game_ui import Ui_GameWindow
 from random import randint
 
 
-class GameLogic(QWidget, Ui_GameWindow):
-    def __init__(self, level, parent=None):
+class GameLogic(QWidget):
+    def __init__(self, ui, level, parent=None):
         super(GameLogic, self).__init__(parent)
         with open(f"levels/structure{level}.txt", "r") as u:
             levelStructure = u.readlines()
         # таймеры
         self.looseTimer, self.animationTimer = QTimer(), QTimer()
         self.animationTimer.setInterval(1000)
-        self.looseTimer.setInterval(10000000000)
-        self.looseTimer.timeout.connect(self.loose)
+        self.looseTimer.setInterval(1000000)
+        self.looseTimer.timeout.connect(lambda: self.run_result(False))
         self.animationTimer.timeout.connect(lambda: self.animan("exitButton"))
         self.looseTimer.start()
         self.animationTimer.start()
         # геймплейные параметры
-        self.gameResult = ResultWidget("no result", parent=self)
-        self.trollPosition = [int(self.levelStats["x"]) // 2, int(self.levelStats["y"]) - 2]
+        self.gridLayout = ui
+        self.trollPosition = [21 // 2, 21 - 2]
         self.levelStructure = [[j for j in i.rstrip()] for i in levelStructure]
         self.troll = self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0])
 
@@ -51,9 +50,9 @@ class GameLogic(QWidget, Ui_GameWindow):
         if self.levelStructure[sector_x_y[1]][sector_x_y[0]] == "W":
             return False
         elif self.levelStructure[sector_x_y[1]][sector_x_y[0]] == "X":
-            self.loose()
+            self.run_result(False)
         elif self.levelStructure[sector_x_y[1]][sector_x_y[0]] == "F":
-            self.win()
+            self.run_result(True)
         self.levelStructure[sector_x_y[1]][sector_x_y[0]] = "T"
         return True
 
@@ -87,15 +86,15 @@ class GameLogic(QWidget, Ui_GameWindow):
             if self.levelStructure[sector[1]][sector[0]] != "T":
                 self.levelStructure[sector[1]][sector[0]] = "G"
         self.hummers = []
-        for i in range(int(self.levelStats["hummers"])):
-            x = randint(1, int(self.levelStats["x"]) - 2)
-            y = randint(1, int(self.levelStats["y"]) - 2)
+        """for i in range(0):
+            x = randint(1, 21) - 2)
+            y = randint(1, 21) - 2)
             if self.levelStructure[y][x] != "G":  # and self.levelStructure[y][x] != "W"
                 continue
             self.hummers.append((x, y))
             self.levelStructure[y][x] = "X"
             exec(f'self.hummer{i}.show()')
-            exec(f'self.gridLayout.addWidget(self.hummer{i}, {y}, {x}, 1, 1)')
+            exec(f'self.gridLayout.addWidget(self.hummer{i}, {y}, {x}, 1, 1)')"""
 
     def animan(self, animation):
         if animation == "exitButton":
@@ -111,13 +110,12 @@ class GameLogic(QWidget, Ui_GameWindow):
         self.animationTimer.stop()
         if result:
             return "you escaped"
-        else:
-            self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]).widget().raise_()
-            self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]) \
-                .widget().setPixmap(QPixmap("textures/PredInterpreterX.jpg"))
-            self.animationTimer.timeout.connect(lambda: self.animan("loose"))
-            self.animationTimer.start()
-            return "you banned"
+        self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]).widget().raise_()
+        self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]) \
+            .widget().setPixmap(QPixmap("textures/PredInterpreterX.jpg"))
+        self.animationTimer.timeout.connect(lambda: self.animan("loose"))
+        self.animationTimer.start()
+        return "you banned"
 
     def game_state(self, state):
         if state == "end":

@@ -2,6 +2,7 @@ import sqlite3
 import PyQt5
 from PyQt5.QtCore import Qt
 from designs.maket_prototype import Ui_Soft
+from board import GameLogic
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QVBoxLayout, QLabel, QLineEdit, QInputDialog, QWidget, \
     QPlainTextEdit, QHBoxLayout, QFileDialog, QMessageBox
@@ -16,6 +17,7 @@ class MyWidget(QMainWindow, Ui_Soft):
     def __init__(self):
         super().__init__()
         self.setupUi(self, QMainWindow, self.level_builder("21 21"), 21 * 21)
+        self.baseWindow = GameLogic(self.playZone, 0)
         self.setWindowTitle('Собственный интерпретатор')
         self.orogin_palete = self.palette()
         self.tema = 'white'
