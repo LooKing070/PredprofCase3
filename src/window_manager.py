@@ -6,6 +6,7 @@ from board import GameLogic
 from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QVBoxLayout, QLabel, QLineEdit, QInputDialog, QWidget, \
     QPlainTextEdit, QHBoxLayout, QFileDialog, QMessageBox
+from PyQt5.QtGui import QFont
 import sys
 
 
@@ -17,7 +18,7 @@ class MyWidget(QMainWindow, Ui_Soft):
     def __init__(self):
         super().__init__()
         self.setupUi(self, QMainWindow, self.level_builder("21 21"), 21 * 21)
-        self.baseWindow = GameLogic(self.gridLayout, 0)
+        #self.baseWindow = GameLogic(self.gridLayout, 0)
         self.setWindowTitle('Собственный интерпретатор')
         self.orogin_palete = self.palette()
         self.tema = 'white'
@@ -38,6 +39,7 @@ class MyWidget(QMainWindow, Ui_Soft):
         self.action_6.triggered.connect(self.save_file_up_menu)  # загрузить txt файл
         self.action_8.triggered.connect(self.delete_file_up_menu)  # удалить файл из приложения
         self.action_13.triggered.connect(self.update_tema_up_menu)  # удалить файл из приложения
+        self.action_15.triggered.connect(self.update_shrift_up_menu)  # удалить файл из приложения
 
 
     def create_new_file_touch_plus(self, index):
@@ -303,6 +305,15 @@ class MyWidget(QMainWindow, Ui_Soft):
         palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.WindowText, brush)
         self.tabWidget.setPalette(palette)
 
+    def update_shrift_up_menu(self):
+        numb, ok_pressed = QInputDialog.getInt(self, "Размер шрифта", "Выберите размер шрифта:", 12, 7, 16, 1)
+        if ok_pressed:
+            for i in range(self.tabWidget.count()):
+                widget : Window_In_QTabWidget = self.tabWidget.widget(i)
+                font = QFont()
+                font.setPointSize(numb)
+                widget.setFont(font)
+
 
     def level_builder(self, x_y, level_num="0", symbol="W"):  # строит уровень Длиной и шириной как задал игрок
         """for testItem in x_y.split():
@@ -340,7 +351,7 @@ class Window_In_QTabWidget(QWidget):
     def initUI(self, name, text):
         layout = QHBoxLayout()
         self.numbers_lines = QPlainTextEdit()
-        self.numbers_lines.setMaximumWidth(25)
+        self.numbers_lines.setMaximumWidth(40)
         self.numbers_lines.setReadOnly(True)
         self.numbers_lines.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.text = QPlainTextEdit()
