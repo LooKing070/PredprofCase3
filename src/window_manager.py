@@ -1,15 +1,11 @@
 import sqlite3
-import PyQt5
 from PyQt5.QtCore import Qt
 from designs.maket_prototype import Ui_Soft
 from board import GameLogic
 from level_loader import level_builder
-from PyQt5 import QtCore, QtGui
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QDialog, QVBoxLayout, QLabel, QLineEdit, QInputDialog, QWidget, \
-    QPlainTextEdit, QHBoxLayout, QFileDialog, QMessageBox
-from PyQt5.QtGui import QFont
-import sys
+from PyQt5.QtWidgets import QMainWindow, QDialog, QInputDialog, QWidget, \
+    QPlainTextEdit, QHBoxLayout, QFileDialog, QMessageBox, QApplication
 
 
 class MyWidget(QMainWindow, Ui_Soft):
@@ -20,6 +16,8 @@ class MyWidget(QMainWindow, Ui_Soft):
         self.setWindowTitle('Собственный интерпретатор')
         self.orogin_palete = self.palette()
         self.tema = 'white'
+        size = QApplication.desktop().availableGeometry().size()
+        self.setFixedSize(size)
 
         con = sqlite3.connect("sql_bd.db")
         cur = con.cursor()
@@ -113,7 +111,6 @@ class MyWidget(QMainWindow, Ui_Soft):
 
         if self.tabWidget.tabText(self.tabWidget.currentIndex()) == '+':
             return
-        print(1)
         message_box = QMessageBox()
         message_box.setText("Вы точно хотите удалить файл?")
         message_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
@@ -307,9 +304,6 @@ class MyWidget(QMainWindow, Ui_Soft):
         font, ok_pressed = QtWidgets.QFontDialog.getFont()
         if ok_pressed:
             self.setFont(font)
-            self.updateGeometry()
-            self.update()
-            self.repaint()
 
 
 class Window_In_QTabWidget(QWidget):
