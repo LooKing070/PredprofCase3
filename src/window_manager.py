@@ -5,8 +5,10 @@ from designs.maket_prototype import Ui_Soft
 from board import GameLogic
 from level_loader import level_builder
 from PyQt5 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QApplication, QMainWindow, QDialog, QVBoxLayout, QLabel, QLineEdit, QInputDialog, QWidget, \
     QPlainTextEdit, QHBoxLayout, QFileDialog, QMessageBox
+from PyQt5.QtGui import QFont
 import sys
 
 
@@ -39,6 +41,7 @@ class MyWidget(QMainWindow, Ui_Soft):
         self.action_6.triggered.connect(self.save_file_up_menu)  # загрузить txt файл
         self.action_8.triggered.connect(self.delete_file_up_menu)  # удалить файл из приложения
         self.action_13.triggered.connect(self.update_tema_up_menu)  # удалить файл из приложения
+        self.action_15.triggered.connect(self.update_shrift_up_menu)  # удалить файл из приложения
 
 
     def create_new_file_touch_plus(self, index):
@@ -304,6 +307,42 @@ class MyWidget(QMainWindow, Ui_Soft):
         palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.WindowText, brush)
         self.tabWidget.setPalette(palette)
 
+    def update_shrift_up_menu(self):
+        font, ok_pressed = QtWidgets.QFontDialog.getFont()
+        if ok_pressed:
+            self.setFont(font)
+            self.updateGeometry()
+            self.update()
+            self.repaint()
+
+
+    def level_builder(self, x_y, level_num="0", symbol="W"):  # строит уровень Длиной и шириной как задал игрок
+        """for testItem in x_y.split():
+            if not testItem.isdigit():
+                raise my_errors.IncorrectLevelBuildFormat"""
+        x, y = [int(p) for p in x_y.split()]
+        """if x % 2 == 0 or (x > 13 or y > 13) or (x < 3 or y < 3):
+            raise my_errors.IncorrectLevelBuildFormat"""
+        level = []
+        for field in range(1, y):
+            if field == 1:
+                level.append("{}{}{}{}".format(symbol * (x // 2), "F", symbol * (x // 2), "\n"))
+            elif field == (y - 1):
+                level.append("{}{}{}{}{}{}".format(symbol, "G" * (x // 2 - 1), "T", "G" * (x // 2 - 1), symbol, "\n"))
+            else:
+                level.append("{}{}{}{}".format(symbol, "G" * (x - 2), symbol, "\n"))
+        level.append(symbol * x)
+        """with open(f"../data/level{level_num}/uroven.txt", "w") as li:
+            li.writelines(level)
+            with open(f"../data/level{level_num}/uroven.csv", "w", newline="", encoding="utf-8") as ls:
+                lines = {"x": f"{x}", "y": f"{y}", "field_walls": "0", "hummers": "5",
+                         "ban_time_range": "2500", "buttons_time": "2000", "ban_time": "300000"}
+                writer = csv.writer(ls, delimiter=';', quotechar='\n', quoting=csv.QUOTE_MINIMAL)
+                for k, v in lines.items():
+                    writer.writerow([k, v])"""
+        return level
+
+
 
 class Window_In_QTabWidget(QWidget):
     def __init__(self, name, text=''):
@@ -313,7 +352,7 @@ class Window_In_QTabWidget(QWidget):
     def initUI(self, name, text):
         layout = QHBoxLayout()
         self.numbers_lines = QPlainTextEdit()
-        self.numbers_lines.setMaximumWidth(25)
+        self.numbers_lines.setMaximumWidth(40)
         self.numbers_lines.setReadOnly(True)
         self.numbers_lines.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.text = QPlainTextEdit()
