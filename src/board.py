@@ -24,36 +24,36 @@ class GameLogic(QWidget):
         self.levelStructure = [[j for j in i.rstrip()] for i in levelStructure]
         self.troll = self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0])
 
-    def troll_move(self):  # куда пойдёт игрок
-        if self.sender().text() == "UP":
+    def troll_move(self, sender):  # куда пойдёт игрок
+        if sender == "UP":
             if self.move_try([self.trollPosition[0], self.trollPosition[1] - 1]):
                 self.troll_moving((0, -1))
             else:
                 pass
-        elif self.sender().text() == "LEFT":
+        elif sender == "LEFT":
             if self.move_try([self.trollPosition[0] - 1, self.trollPosition[1]]):
                 self.troll_moving((-1, 0))
             else:
                 pass
-        elif self.sender().text() == "RIGHT":
+        elif sender == "RIGHT":
             if self.move_try([self.trollPosition[0] + 1, self.trollPosition[1]]):
                 self.troll_moving((1, 0))
             else:
                 pass
-        elif self.sender().text() == "DOWN":
+        elif sender == "DOWN":
             if self.move_try([self.trollPosition[0], self.trollPosition[1] + 1]):
                 self.troll_moving((0, 1))
             else:
                 pass
 
-    def move_try(self, sector_x_y):  # что произойдёт, если игрок куда-то пойдёт
-        if self.levelStructure[sector_x_y[1]][sector_x_y[0]] == "W":
+    def move_try(self, sector_direction):  # что произойдёт, если игрок куда-то пойдёт
+        if self.levelStructure[sector_direction[1]][sector_direction[0]] == "W":
             return False
-        elif self.levelStructure[sector_x_y[1]][sector_x_y[0]] == "X":
+        elif self.levelStructure[sector_direction[1]][sector_direction[0]] == "X":
             self.run_result(False)
-        elif self.levelStructure[sector_x_y[1]][sector_x_y[0]] == "F":
+        elif self.levelStructure[sector_direction[1]][sector_direction[0]] == "F":
             self.run_result(True)
-        self.levelStructure[sector_x_y[1]][sector_x_y[0]] = "T"
+        self.levelStructure[sector_direction[1]][sector_direction[0]] = "T"
         return True
 
     def troll_moving(self, x_y):  # сама ходьба
