@@ -8,7 +8,8 @@ def level_builder(x_y, level_num=0, symbol="W"):  # строит уровень 
     level = []
     for field in range(1, y):
         if field == 1:
-            level.append("{}{}{}{}".format(symbol * (x // 2), "F", symbol * (x // 2), "\n"))
+            level.append(symbol * x)
+            # level.append("{}{}{}{}".format(symbol * (x // 2), "F", symbol * (x // 2), "\n"))
         elif field == (y - 1):
             level.append("{}{}{}{}{}{}".format(symbol, "G" * (x // 2 - 1), "T", "G" * (x // 2 - 1), symbol, "\n"))
         else:

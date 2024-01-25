@@ -27,7 +27,8 @@ class MyWidget(QMainWindow, Ui_Soft):
             self.tabWidget.insertTab(self.tabWidget.count() - 1, widget, lst[0])
         con.commit()
         con.close()
-        # self.runButton.clicked.connect(self.baseWindow.run_state())
+        self.runButton.clicked.connect(lambda: self.baseWindow.run_state("run"))
+        self.stopButton.clicked.connect(lambda: self.baseWindow.run_state("stop"))
         self.tabWidget.setCurrentIndex(0)
 
         self.tabWidget.tabBarClicked.connect(

@@ -1,4 +1,3 @@
-import csv
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import QTimer
@@ -20,9 +19,10 @@ class GameLogic(QWidget):
         self.animationTimer.start()
         # геймплейные параметры
         self.gridLayout = ui
-        self.trollPosition = [21 // 2, 21 - 2]
         self.levelStructure = [[j for j in i.rstrip()] for i in levelStructure]
+        self.trollPosition = [len(self.levelStructure[0]) // 2, len(self.levelStructure) - 2]
         self.troll = self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0])
+        self.command_n = -1
 
     def troll_move(self, sender):  # куда пойдёт игрок
         if sender == "UP":
@@ -66,27 +66,12 @@ class GameLogic(QWidget):
         self.gridLayout.addWidget(self.troll.widget(), self.trollPosition[1], self.trollPosition[0])
         self.gridLayout.addWidget(element.widget(), self.trollPosition[1] - x_y[1], self.trollPosition[0] - x_y[0])
 
-    def troll_stop(self, stopped):  # Прячет кнопки, если троль столкнулся со стеной
-        if stopped:
-            self.upButton.show()
-            self.downButton.show()
-            self.leftButton.show()
-            self.rightButton.show()
-            self.stopTimer.stop()
-        else:
-            self.upButton.hide()
-            self.downButton.hide()
-            self.leftButton.hide()
-            self.rightButton.hide()
-            self.stopTimer.timeout.connect(lambda: self.troll_stop(True))
-            self.stopTimer.start()
-
     def ban_hummer(self):  # клетки, на которые нельзя наступать
-        for sector in self.hummers:
+        """for sector in self.hummers:
             if self.levelStructure[sector[1]][sector[0]] != "T":
                 self.levelStructure[sector[1]][sector[0]] = "G"
         self.hummers = []
-        """for i in range(0):
+        for i in range(0):
             x = randint(1, 21) - 2)
             y = randint(1, 21) - 2)
             if self.levelStructure[y][x] != "G":  # and self.levelStructure[y][x] != "W"
@@ -96,32 +81,37 @@ class GameLogic(QWidget):
             exec(f'self.hummer{i}.show()')
             exec(f'self.gridLayout.addWidget(self.hummer{i}, {y}, {x}, 1, 1)')"""
 
-    def animan(self, animation):
-        if animation == "exitButton":
-            self.exitButton_2.setText(str(self.looseTimer.remainingTime() // 1000))
+    def animan(self, animation, commands=None):
+        if animation == "walk":
+            if self.command_n >= len(commands) - 2:
+                self.run_result(True)
+                self.troll_move(commands[self.command_n])
+                return
+            self.command_n += 1
+            self.troll_move(commands[self.command_n])
         elif animation == "loose":
             self.animationTimer.stop()
             self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]).widget().raise_()
             self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]) \
-                .widget().setPixmap(QPixmap("textures/PredInterpreterX.jpg"))
-            self.playerState.setPixmap(QPixmap("textures/PredInterpreterF.jpg"))
+                .widget().setPixmap(QPixmap("textures/PredInterpreterT.jpg"))
 
     def run_result(self, result):
         self.animationTimer.stop()
+        self.command_n = -1
         if result:
             return "you escaped"
         self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]).widget().raise_()
         self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]) \
-            .widget().setPixmap(QPixmap("textures/PredInterpreterX.jpg"))
+            .widget().setPixmap(QPixmap("textures/PredInterpreterW.jpg"))
         self.animationTimer.timeout.connect(lambda: self.animan("loose"))
         self.animationTimer.start()
         return "you banned"
 
-    def run_state(self, state="run", commands=("RIGHT", "UP")):
+    def run_state(self, state="run", commands=("LEFT", "UP")):
         if state == "run":
             for command in commands:
                 self.troll_move(command)
-                print(self.trollPosition)
+            # self.animationTimer.timeout.connect(lambda: self.animan("walk", commands))
+            # self.animationTimer.start()
         elif state == "stop":
             self.run_result(False)
-
