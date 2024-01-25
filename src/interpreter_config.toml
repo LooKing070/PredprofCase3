@@ -1,9 +1,9 @@
 [SINGLE_KEYWORDS]
 #KEYWORD; пробелы/отступы; другое(аргументы, доп. синтаксис) = [имя функци, *(строка - аргумент; число - индекс элемента строки)]
-"[ \t]*UP[ \t]+[0-9]+" = ["self.move_player", "UP", 1]
-"[ \t]*DOWN[ \t]+[0-9]+" = ["self.move_player", "DOWN", 1]
-"[ \t]*LEFT[ \t]+[0-9]+" = ["self.move_player", "LEFT", 1]
-"[ \t]*RIGHT[ \t]+[0-9]+" = ["self.move_player", "RIGHT", 1]
+"[ \t]*UP[ \t]+[0-9a-zA-Z]+" = ["self.move_player", "UP", 1]
+"[ \t]*DOWN[ \t]+[0-9a-zA-Z]+" = ["self.move_player", "DOWN", 1]
+"[ \t]*LEFT[ \t]+[0-9a-zA-Z]+" = ["self.move_player", "LEFT", 1]
+"[ \t]*RIGHT[ \t]+[0-9a-zA-Z]+" = ["self.move_player", "RIGHT", 1]
 "[ \t]*SET[ \t]*[a-zA-Z]+[ \t]*=[ \t]*[0-9]+" = ["self.set_program_variable", 1, 2]
 "[ \t]*CALL[ \t]+[a-zA-Z]+" = ["self.call_procedure", 1]
 

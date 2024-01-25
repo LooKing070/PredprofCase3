@@ -115,6 +115,13 @@ class Interpreter:
             self.__config = tomli.load(f)
 
     def move_player(self, direction, steps):
+        try:
+            steps = int(steps)
+        except ValueError:
+            try:
+                steps = self._variables[steps]
+            except KeyError:
+                print(f"Ошибка: использование необъявленной переменной {steps}")
         print(f"Перемещаем игрока на {steps} в направлении {direction}")
 
     def set_program_variable(self, name, value):
@@ -135,14 +142,14 @@ if __name__ == "__main__":
     interp = Interpreter()
     error_code = interp.parse_code('''
 LEFT 99999
-SET N=3
+SET N=500
 PROCEDURE N
     LEFT 2
     RIGHT 2
 ENDPROC
 REPEAT 2
     LEFT 2
-    LEFT 3
+    LEFT N
     IFBLOCK LEFT
         LEFT 999
         RIGHT 998
