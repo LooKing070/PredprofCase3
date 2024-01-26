@@ -19,7 +19,7 @@ class Interpreter:
         self._code_buffer = []
         self._error_buffer: list[tuple[int, str]] = []
 
-    def parse_code(self, code: list[str]) -> None:
+    def parse_code(self, code: list[str], return_code: bool = False) -> tuple | None:
         if not any(line.strip() for line in code):
             self._error_buffer.append((-1, "Код отсутствует"))
         stack = []
@@ -74,10 +74,15 @@ class Interpreter:
 
         open_pairs(block_pairs)
 
+        returned_code = []
         for index, line in enumerate(code):
-            self._parse_line(line)
+            res = self._parse_line(line, return_code=return_code)
+            returned_code.append(res)
 
-    def _parse_line(self, line) -> None:
+        if return_code:
+            return returned_code
+
+    def _parse_line(self, line, return_code: bool = False) -> None | tuple:
         for mask in self.__config["SINGLE_KEYWORDS"]:
             if re.fullmatch(mask, line):
                 command_data = self.__config["SINGLE_KEYWORDS"][mask]
@@ -89,11 +94,19 @@ class Interpreter:
                     else:
                         args.append(config_arg)
 
-                exec(f"{command_data[0]}(*{args})")
+                res = eval(f"{command_data[0]}(*{args})")
+                if not return_code:
+                    self._code_buffer.append(res)
+                else:
+                    return res
                 break
         else:
             if "self" in line:
-                exec(line)
+                res = eval(line)
+                if not return_code:
+                    self._code_buffer.append(res)
+                else:
+                    return res
             elif any(1 for mask in self.__config["DOUBLE_KEYWORDS"].keys() if
                      re.fullmatch(mask, line) or re.fullmatch(self.__config["DOUBLE_KEYWORDS"][mask], line)):
                 pass
@@ -115,7 +128,7 @@ class Interpreter:
         with open("interpreter_config.toml", "rb") as f:
             self.__config = tomli.load(f)
 
-    def move_player(self, direction, steps):
+    def move_player(self, direction, steps) -> tuple[str, int]:
         try:
             steps = int(steps)
         except ValueError:
@@ -125,17 +138,17 @@ class Interpreter:
                 self._error_buffer.append((-1, f"Ошибка: использование необъявленной переменной {steps}"))
         if steps < 1:
             self._error_buffer.append((-1, "Ошибка занчения: величина шага не может быть меньше 1"))
-        self._code_buffer.append((direction, steps))
+        return direction, steps
 
     def set_program_variable(self, name, value):
         self._variables[name] = value
 
     def do_if(self, direction, *code):
-        self._code_buffer.append((f"IF {direction}", 1))
+        return (f"IF {direction}", 1), self.parse_code(*code, return_code=True)
 
     def call_procedure(self, procedure_name):
         if procedure_name in self._procedures.keys():
-            self.parse_code(self._procedures[procedure_name])
+            return self.parse_code(self._procedures[procedure_name], return_code=True)
         else:
             self._error_buffer.append((-1, "Попытка вызова несуществующей функции"))
 
@@ -157,6 +170,12 @@ class Interpreter:
 
 if __name__ == "__main__":
     interp = Interpreter()
-    error_code = interp.parse_code('''
+    t = interp.parse_code('''
+LEFT 10
+IFBLOCK RIGHT
+    RIGHT 5
+    LEFT 10
+ENDIF
     '''.split("\n"))
+    print(interp.code_buffer)
     print(interp.error_buffer)

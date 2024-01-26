@@ -43,7 +43,8 @@ class MyWidget(QMainWindow, Ui_Soft):
         self.action_8.triggered.connect(self.delete_file_up_menu)  # удалить файл из приложения
         self.action_13.triggered.connect(self.update_tema_up_menu)  # удалить файл из приложения
         self.action_15.triggered.connect(self.update_shrift_up_menu)  # удалить файл из приложения
-        self.runButton.clicked.connect(self.give_text_to_interpretator)
+        self.runButton.clicked.connect(self.give_text_to_interpreter)
+        # self.runButton.clicked.connect(lambda: self.baseWindow.run_state("run"))
         self.stopButton.clicked.connect(lambda: self.baseWindow.run_state("stop"))
 
     def create_new_file_touch_plus(self, index):
@@ -313,13 +314,13 @@ class MyWidget(QMainWindow, Ui_Soft):
         if ok_pressed:
             self.setFont(font)
 
-    def give_text_to_interpretator(self):
+    def give_text_to_interpreter(self):
         numb_wind = self.tabWidget.currentIndex()
         if numb_wind != self.tabWidget.count() - 1:
             self.interpreter.parse_code(self.tabWidget.widget(numb_wind).text.toPlainText().split('\n'))
-            errors = None
+            errors = self.interpreter.error_buffer
             if errors:
-                pass
+                print(errors)
             else:
                 self.baseWindow.run_state(state="run", commands=self.interpreter.code_buffer)
 
