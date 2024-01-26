@@ -11,7 +11,7 @@ class GameLogic(QWidget):
             levelStructure = u.readlines()
         # таймеры
         self.looseTimer, self.animationTimer = QTimer(), QTimer()
-        self.animationTimer.setInterval(1000)
+        self.animationTimer.setInterval(500)
         self.looseTimer.setInterval(1000000)
         self.looseTimer.timeout.connect(lambda: self.run_result(False))
         # self.animationTimer.timeout.connect(lambda: self.animan("exitButton"))
@@ -22,7 +22,7 @@ class GameLogic(QWidget):
         self.levelStructure = [[j for j in i.rstrip()] for i in levelStructure]
         self.trollPosition = [len(self.levelStructure[0]) // 2, len(self.levelStructure) - 2]
         self.troll = self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0])
-        self.command_n = -1
+        self.command_n = 0
 
     def troll_move(self, sender):  # куда пойдёт игрок
         if sender == "UP":
@@ -89,14 +89,14 @@ class GameLogic(QWidget):
             exec(f'self.hummer{i}.show()')
             exec(f'self.gridLayout.addWidget(self.hummer{i}, {y}, {x}, 1, 1)')"""
 
-    def animan(self, animation, commands=None):
+    def animan(self, animation, command_tuple=None, comms_len=999):
         if animation == "walk":
-            if self.command_n >= len(commands) - 2:
+            if self.command_n >= comms_len - 1:
                 self.run_result(True)
-                self.troll_move(commands[self.command_n])
-                return
+            for _ in range(command_tuple[1]):
+                self.troll_move(command_tuple[0])
             self.command_n += 1
-            self.troll_move(commands[self.command_n])
+            print(animation, command_tuple, self.command_n)
         elif animation == "loose":
             self.animationTimer.stop()
             self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]).widget().raise_()
@@ -105,7 +105,7 @@ class GameLogic(QWidget):
 
     def run_result(self, result):
         self.animationTimer.stop()
-        self.command_n = -1
+        self.command_n = 0
         if result:
             return "you escaped"
         self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]).widget().raise_()
@@ -115,12 +115,9 @@ class GameLogic(QWidget):
         self.animationTimer.start()
         return "you banned"
 
-    def run_state(self, state="run", commands=(("IF LEFT", 1), ("UP", 1), ("IF RIGHT", 1), ("IF UP", 1), ("IF DOWN", 1))):
+    def run_state(self, state="run", commands=(("IF LEFT", 1), ("IF RIGHT", 1), ("IF UP", 1), ("IF DOWN", 1))):
         if state == "run":
-            for command, repetition in commands:
-                for _ in range(repetition):
-                    self.troll_move(command)
-            # self.animationTimer.timeout.connect(lambda: self.animan("walk", commands))
-            # self.animationTimer.start()
+            self.animationTimer.timeout.connect(lambda: self.animan("walk", commands[self.command_n], len(commands)))
+            self.animationTimer.start()
         elif state == "stop":
             self.run_result(False)
