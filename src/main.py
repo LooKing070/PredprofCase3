@@ -29,4 +29,5 @@ if __name__ == "__main__":
         main()
         logging.info("Программа завершила работу")
     except Exception as e:
+        print(e)
         logging.critical(e, exc_info=True)

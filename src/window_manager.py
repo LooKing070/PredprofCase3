@@ -29,9 +29,9 @@ class MyWidget(QMainWindow, Ui_Soft):
             self.tabWidget.insertTab(self.tabWidget.count() - 1, widget, lst[0])
         con.commit()
         con.close()
-        self.runButton.clicked.connect(lambda: self.baseWindow.run_state("run"))
-        self.stopButton.clicked.connect(lambda: self.baseWindow.run_state("stop"))
+
         self.tabWidget.setCurrentIndex(0)
+        #self.boardWigets.setAlignment(Qt.AlignCenter)
 
         self.tabWidget.tabBarClicked.connect(
             self.create_new_file_touch_plus)  # переключение вкладок, отслеживаем нажатие плюса
@@ -41,6 +41,8 @@ class MyWidget(QMainWindow, Ui_Soft):
         self.action_8.triggered.connect(self.delete_file_up_menu)  # удалить файл из приложения
         self.action_13.triggered.connect(self.update_tema_up_menu)  # удалить файл из приложения
         self.action_15.triggered.connect(self.update_shrift_up_menu)  # удалить файл из приложения
+        self.runButton.clicked.connect(self.give_text_to_interpretator)
+        self.stopButton.clicked.connect(lambda: self.baseWindow.run_state("stop"))
 
     def create_new_file_touch_plus(self, index):
         if index == self.tabWidget.count() - 1:
@@ -309,6 +311,17 @@ class MyWidget(QMainWindow, Ui_Soft):
         font, ok_pressed = QtWidgets.QFontDialog.getFont()
         if ok_pressed:
             self.setFont(font)
+
+    def give_text_to_interpretator(self):
+        numb_wind = self.tabWidget.currentIndex()
+        if numb_wind != self.tabWidget.count() - 1:
+            print(self.tabWidget.widget(numb_wind).text.toPlainText())
+            self.interpreter.parse_code(self.tabWidget.widget(numb_wind).text.toPlainText().split('\n'))
+            errors = None
+            if errors:
+                pass
+            else:
+                self.baseWindow.run_state(state="run", commands=self.interpreter.code_buffer)
 
 
 class Window_In_QTabWidget(QWidget):
