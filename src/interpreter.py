@@ -17,10 +17,11 @@ class Interpreter:
         self.reload_config()
 
         self._code_buffer = []
+        self._error_buffer: list[tuple[int, str]] = []
 
-    def parse_code(self, code: list[str]) -> tuple[int, str] | None:
+    def parse_code(self, code: list[str]) -> None:
         if not any(line.strip() for line in code):
-            return -1, "Код отсутствует"
+            self._error_buffer.append((-1, "Код отсутствует"))
         stack = []
         block_pairs = []
         # Нахождение парных блоков
@@ -33,7 +34,7 @@ class Interpreter:
 
             # Проверка уровне вложенности кода
             if len(stack) > 3:
-                return index, "Превышен максимальный уровень вложенности"
+                self._error_buffer.append((index, "Превышен максимальный уровень вложенности"))
 
             # Поиск закрывающего блока
             for mask in self.__config["DOUBLE_KEYWORDS"].values():
@@ -44,11 +45,12 @@ class Interpreter:
                             block_pairs.append((opener, index))
                             break
                     else:
-                        return index, "Отсутствует открывающий блок или указан неверный закрывающий блок"
+                        self._error_buffer.append((index, "Отсутствует открывающий блок или указан неверный "
+                                                          "закрывающий блок"))
                     break
 
         if stack:
-            return -1, "Неверное количество закрывающих блоков"
+            self._error_buffer.append((-1, "Неверное количество закрывающих блоков"))
 
         for i in range(len(block_pairs)):
             block_pairs[i] = [block_pairs[i][0][0], block_pairs[i][1]]
@@ -73,14 +75,9 @@ class Interpreter:
         open_pairs(block_pairs)
 
         for index, line in enumerate(code):
-            error_code = self._parse_line(line)
+            self._parse_line(line)
 
-        if error_code:
-            return -1, error_code
-
-        return -1, "Код успешно выполнен"
-
-    def _parse_line(self, line) -> str | None:
+    def _parse_line(self, line) -> None:
         for mask in self.__config["SINGLE_KEYWORDS"]:
             if re.fullmatch(mask, line):
                 command_data = self.__config["SINGLE_KEYWORDS"][mask]
@@ -102,7 +99,7 @@ class Interpreter:
                 pass
             else:
                 if line.strip():
-                    return "Указано неверное ключевое слово"
+                    self._error_buffer.append((-1, "Указано неверное ключевое слово"))
 
     def _decode_block(self, code_block: list[str]) -> list[str]:
         if code_block[0].strip().startswith("REPEAT"):
@@ -125,49 +122,41 @@ class Interpreter:
             try:
                 steps = self._variables[steps]
             except KeyError:
-                print(f"Ошибка: использование необъявленной переменной {steps}")
-        print(f"Перемещаем игрока на {steps} в направлении {direction}")
+                self._error_buffer.append((-1, f"Ошибка: использование необъявленной переменной {steps}"))
+        if steps < 1:
+            self._error_buffer.append((-1, "Ошибка занчения: величина шага не может быть меньше 1"))
+        self._code_buffer.append((direction, steps))
 
     def set_program_variable(self, name, value):
         self._variables[name] = value
 
     def do_if(self, direction, *code):
-        print(f"Выполняем код если свобона клетка {direction}")
+        self._code_buffer.append((f"IF {direction}", 1))
 
     def call_procedure(self, procedure_name):
         if procedure_name in self._procedures.keys():
             self.parse_code(self._procedures[procedure_name])
         else:
-            print("Попытка вызова несуществующей функции")
+            self._error_buffer.append((-1, "Попытка вызова несуществующей функции"))
 
     @property
-    def code_buffer(self) -> list[str]:
+    def code_buffer(self) -> list[tuple[str, int]]:
         t = self._code_buffer.copy()
         self._code_buffer.clear()
         return t
+
+    @property
+    def error_buffer(self) -> tuple[int, str]:
+        t = self._error_buffer.copy()
+        self._error_buffer.clear()
+        if t:
+            return t[0]
+        else:
+            return tuple()
 
 
 if __name__ == "__main__":
     interp = Interpreter()
     error_code = interp.parse_code('''
-LEFT 99999
-SET M=500
-PROCEDURE N
-    LEFT 2
-    RIGHT 2
-ENDPROC
-REPEAT 2
-    LEFT 2
-    LEFT M
-    IFBLOCK LEFT
-        LEFT 999
-        RIGHT 998
-        UP 1
-    ENDIF
-    LEFT 4
-    LEFT 5
-ENDREPEAT
-CALL N
-LEFT 9999
     '''.split("\n"))
-    print("\n", *error_code, sep="\n")
+    print(interp.error_buffer)
