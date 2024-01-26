@@ -88,7 +88,6 @@ class MyWidget(QMainWindow, Ui_Soft):
             file_extension = file_name.split('.')
             print(file_name, file_extension)
             if file_extension[-1] == 'txt':
-                print(2)
                 if file_extension[0].split('/')[-1] not in [self.tabWidget.tabText(i) for i in
                                                             range(self.tabWidget.count())]:
                     with open(file_name) as file:
@@ -317,7 +316,6 @@ class MyWidget(QMainWindow, Ui_Soft):
     def give_text_to_interpretator(self):
         numb_wind = self.tabWidget.currentIndex()
         if numb_wind != self.tabWidget.count() - 1:
-            print(self.tabWidget.widget(numb_wind).text.toPlainText())
             self.interpreter.parse_code(self.tabWidget.widget(numb_wind).text.toPlainText().split('\n'))
             errors = None
             if errors:

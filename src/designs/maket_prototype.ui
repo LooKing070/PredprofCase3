@@ -95,13 +95,16 @@
          </layout>
         </widget>
        </item>
-       <item>
+       <item alignment="Qt::AlignHCenter">
         <widget class="QWidget" name="boardWigets" native="true">
          <property name="minimumSize">
           <size>
            <width>500</width>
            <height>0</height>
           </size>
+         </property>
+         <property name="layoutDirection">
+          <enum>Qt::LeftToRight</enum>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout">
           <property name="spacing">
@@ -202,8 +205,6 @@
     <addaction name="action_13"/>
     <addaction name="separator"/>
     <addaction name="action_15"/>
-    <addaction name="separator"/>
-    <addaction name="action_17"/>
     <addaction name="separator"/>
    </widget>
    <addaction name="menu"/>

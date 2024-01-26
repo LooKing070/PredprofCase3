@@ -1,4 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import Qt
 
 
 class Ui_Soft(object):
@@ -36,6 +37,7 @@ class Ui_Soft(object):
         self.horizontalLayout_2.addWidget(self.interpreterWidgets)
         self.boardWigets = QtWidgets.QWidget(self.windowManager)
         self.boardWigets.setMinimumSize(QtCore.QSize(500, 0))
+        self.boardWigets.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.boardWigets.setObjectName("boardWigets")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.boardWigets)
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
@@ -105,7 +107,7 @@ class Ui_Soft(object):
         self.plainTextEdit.setMaximumSize(QtCore.QSize(16777215, 250))
         self.plainTextEdit.setObjectName("plainTextEdit")
         self.verticalLayout.addWidget(self.plainTextEdit)
-        self.horizontalLayout_2.addWidget(self.boardWigets)
+        self.horizontalLayout_2.addWidget(self.boardWigets, 0, QtCore.Qt.AlignHCenter)
         self.horizontalLayout.addWidget(self.windowManager)
         Soft.setCentralWidget(self.centralWindow)
         self.statusbar = QtWidgets.QStatusBar(Soft)
@@ -159,8 +161,6 @@ class Ui_Soft(object):
         self.menu_2.addSeparator()
         self.menu_2.addAction(self.action_15)
         self.menu_2.addSeparator()
-        self.menu_2.addAction(self.action_17)
-        self.menu_2.addSeparator()
         self.menuBar.addAction(self.menu.menuAction())
         self.menuBar.addAction(self.menu_2.menuAction())
 
@@ -184,7 +184,6 @@ class Ui_Soft(object):
         self.action_11.setText(_translate("Soft", "Сохранить как"))
         self.action_13.setText(_translate("Soft", "Фон"))
         self.action_15.setText(_translate("Soft", "Шрифт"))
-        self.action_17.setText(_translate("Soft", "Язык"))
         self.action_2.setText(_translate("Soft", "Создать"))
         self.action_3.setText(_translate("Soft", "Открыть"))
         self.action_6.setText(_translate("Soft", "Сохранить как"))
