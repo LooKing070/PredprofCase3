@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import QTimer
-from random import randint
+# from random import randint
 
 
 class GameLogic(QWidget):
@@ -21,29 +21,28 @@ class GameLogic(QWidget):
         self.levelStructure = [[j for j in i.rstrip()] for i in levelStructure]
         self.trollPosition = [0, 0]
         self.troll = self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0])
-        self.command_n = 0
 
     def troll_move(self, sender):  # куда пойдёт игрок
         if sender == "UP":
             if self.move_try([self.trollPosition[0], self.trollPosition[1] - 1]):
                 self.troll_moving((0, -1))
             else:
-                pass
+                print("troll не может ходить в стену или убегать с поля")
         elif sender == "LEFT":
             if self.move_try([self.trollPosition[0] - 1, self.trollPosition[1]]):
                 self.troll_moving((-1, 0))
             else:
-                pass
+                print("troll не может ходить в стену или убегать с поля")
         elif sender == "RIGHT":
             if self.move_try([self.trollPosition[0] + 1, self.trollPosition[1]]):
                 self.troll_moving((1, 0))
             else:
-                pass
+                print("troll не может ходить в стену или убегать с поля")
         elif sender == "DOWN":
             if self.move_try([self.trollPosition[0], self.trollPosition[1] + 1]):
                 self.troll_moving((0, 1))
             else:
-                pass
+                print("troll не может ходить в стену или убегать с поля")
         elif sender == "IF LEFT":
             return self.move_try([self.trollPosition[0] - 1, self.trollPosition[1]])
         elif sender == "IF RIGHT":
@@ -53,14 +52,16 @@ class GameLogic(QWidget):
         elif sender == "IF DOWN":
             return self.move_try([self.trollPosition[0], self.trollPosition[1] + 1])
 
-    def move_try(self, sector_direction):  # что произойдёт, если игрок куда-то пойдёт
-        if self.levelStructure[sector_direction[1]][sector_direction[0]] == "W":
+    def move_try(self, sector_x_y):  # что произойдёт, если игрок куда-то пойдёт
+        if sector_x_y[0] < 0 or 21 < sector_x_y[0] or sector_x_y[1] < 0 or 21 < sector_x_y[1]:
             return False
-        elif self.levelStructure[sector_direction[1]][sector_direction[0]] == "X":
+        elif self.levelStructure[sector_x_y[1]][sector_x_y[0]] == "W":
+            return False
+        elif self.levelStructure[sector_x_y[1]][sector_x_y[0]] == "X":
             self.run_result(False)
-        elif self.levelStructure[sector_direction[1]][sector_direction[0]] == "F":
+        elif self.levelStructure[sector_x_y[1]][sector_x_y[0]] == "F":
             self.run_result(True)
-        self.levelStructure[sector_direction[1]][sector_direction[0]] = "T"
+        self.levelStructure[sector_x_y[1]][sector_x_y[0]] = "T"
         return True
 
     def troll_moving(self, x_y):  # сама ходьба
@@ -90,11 +91,11 @@ class GameLogic(QWidget):
 
     def animan(self, animation, command_tuple=None, comms_len=999):
         if animation == "walk":
-            if self.command_n >= comms_len - 1:
+            if comms_len:
+                for _ in range(command_tuple[1]):
+                    self.troll_move(command_tuple[0])
+            else:
                 self.run_result(True)
-            for _ in range(command_tuple[1]):
-                self.troll_move(command_tuple[0])
-            self.command_n += 1
         elif animation == "loose":
             self.animationTimer.stop()
             self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]).widget().raise_()
@@ -103,7 +104,6 @@ class GameLogic(QWidget):
 
     def run_result(self, result):
         self.animationTimer.stop()
-        self.command_n = -1
         if result:
             return "you escaped"
         self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]).widget().raise_()
@@ -115,7 +115,7 @@ class GameLogic(QWidget):
 
     def run_state(self, state="run", commands=(("IF LEFT", 1), ("IF RIGHT", 1), ("IF UP", 1), ("IF DOWN", 1))):
         if state == "run":
-            self.animationTimer.timeout.connect(lambda: self.animan("walk", commands[self.command_n], len(commands)))
+            self.animationTimer.timeout.connect(lambda: self.animan("walk", commands.pop(0), len(commands)))
             self.animationTimer.start(500)
         elif state == "stop":
             self.run_result(False)

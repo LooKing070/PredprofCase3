@@ -2,7 +2,7 @@ import sqlite3
 from PyQt5.QtCore import Qt
 from designs.maket_prototype import Ui_Soft
 from board import GameLogic
-from level_loader import level_builder
+from level_loader import level_builder, add_play_zone
 from interpreter import Interpreter
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QDialog, QInputDialog, QWidget, \
@@ -12,10 +12,10 @@ from PyQt5.QtWidgets import QMainWindow, QDialog, QInputDialog, QWidget, \
 class MyWidget(QMainWindow, Ui_Soft):
     def __init__(self):
         super().__init__()
+        # 1 загрузка
         with open(f"levels/structure{0}.txt", "r") as u:
             levelStructure = u.readlines()
-            self.setupUi(self, QMainWindow, levelStructure, 21*21)
-        self.baseWindow = GameLogic(self.gridLayout, 0)
+            self.baseWindow = self.setupUi(self, QMainWindow, levelStructure, 21 * 21)
         self.interpreter = Interpreter()
 
         self.setWindowTitle('Собственный интерпретатор')
@@ -36,7 +36,7 @@ class MyWidget(QMainWindow, Ui_Soft):
         con.close()
 
         self.tabWidget.setCurrentIndex(0)
-        #self.boardWigets.setAlignment(Qt.AlignCenter)
+        # self.boardWigets.setAlignment(Qt.AlignCenter)
 
         self.tabWidget.tabBarClicked.connect(
             self.create_new_file_touch_plus)  # переключение вкладок, отслеживаем нажатие плюса
@@ -46,9 +46,10 @@ class MyWidget(QMainWindow, Ui_Soft):
         self.action_8.triggered.connect(self.delete_file_up_menu)  # удалить файл из приложения
         self.action_13.triggered.connect(self.update_tema_up_menu)  # удалить файл из приложения
         self.action_15.triggered.connect(self.update_shrift_up_menu)  # удалить файл из приложения
+
+        # запуск и остановка кода
         self.runButton.clicked.connect(self.give_text_to_interpreter)
-        # self.runButton.clicked.connect(lambda: self.baseWindow.run_state("run"))
-        self.stopButton.clicked.connect(lambda: self.baseWindow.run_state("stop"))
+        self.stopButton.clicked.connect(lambda: self.gameWindow.run_state("stop"))
 
     def create_new_file_touch_plus(self, index):
         if index == self.tabWidget.count() - 1:
@@ -172,8 +173,24 @@ class MyWidget(QMainWindow, Ui_Soft):
             if errors:
                 self.plainTextEdit.setPlainText(errors[1])
             else:
-                self.baseWindow.run_state(state="run", commands=self.interpreter.code_buffer)
+                self.run_game("run")
 
+    def run_game(self, status):
+        try:
+            self.verticalLayout.removeItem(self.gridLayout)
+            self.gridLayout.deleteLater()
+            self.playZone.deleteLater()
+            with open(f"levels/structure{0}.txt", "r") as u:
+                levelStructure = u.readlines()
+                add_play_zone(self, levelStructure, 21*21)
+            self.gameWindow = GameLogic(self.gridLayout, 0)
+            self.gameWindow.run_state(state=status, commands=self.interpreter.code_buffer)
+        except AttributeError as ae:
+            self.gameWindow.run_state(state="stop", commands=("IF LEFT", 1))
+            self.plainTextEdit.setPlainText("Нельзя убегать с поля")
+        except IndexError as ie:
+            self.gameWindow.run_state(state="stop", commands=("IF LEFT", 1))
+            self.plainTextEdit.setPlainText("Нельзя убегать с поля")
 
 class Window_In_QTabWidget(QWidget):
     def __init__(self, name, text=''):
