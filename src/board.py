@@ -45,6 +45,8 @@ class GameLogic(QWidget):
                 self.troll_moving((0, 1))
             else:
                 pass
+        elif sender == "IF LEFT":
+            print(''.join(self.levelStructure[self.trollPosition[1]][:self.trollPosition[0]]).rfind("W"))
 
     def move_try(self, sector_direction):  # что произойдёт, если игрок куда-то пойдёт
         if self.levelStructure[sector_direction[1]][sector_direction[0]] == "W":
@@ -107,10 +109,11 @@ class GameLogic(QWidget):
         self.animationTimer.start()
         return "you banned"
 
-    def run_state(self, state="run", commands=("LEFT", "UP")):
+    def run_state(self, state="run", commands=(("IF LEFT", 1), ("UP", 1))):
         if state == "run":
-            for command in commands:
-                self.troll_move(command)
+            for command, repetition in commands:
+                for _ in range(repetition):
+                    self.troll_move(command)
             # self.animationTimer.timeout.connect(lambda: self.animan("walk", commands))
             # self.animationTimer.start()
         elif state == "stop":

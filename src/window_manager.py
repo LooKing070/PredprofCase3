@@ -12,7 +12,9 @@ from PyQt5.QtWidgets import QMainWindow, QDialog, QInputDialog, QWidget, \
 class MyWidget(QMainWindow, Ui_Soft):
     def __init__(self):
         super().__init__()
-        self.setupUi(self, QMainWindow, level_builder("21 21"), 21 * 21)
+        with open(f"levels/structure{0}.txt", "r") as u:
+            levelStructure = u.readlines()
+            self.setupUi(self, QMainWindow, levelStructure, 21*21)
         self.baseWindow = GameLogic(self.gridLayout, 0)
         self.interpreter = Interpreter()
 
