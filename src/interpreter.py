@@ -3,10 +3,6 @@ from __future__ import annotations
 import re
 
 
-# TODO добавить ошибки при парсинге строки кода
-# TODO запуск действий игрока
-
-
 class Interpreter:
     def __init__(self):
         # Переменные программы
@@ -33,7 +29,7 @@ class Interpreter:
                     break
 
             # Проверка уровне вложенности кода
-            if len(stack) > 3:
+            if len(stack) > self.__config["LIMITATIONS"]["block_depth"]:
                 self._error_buffer.append((index, "Превышен максимальный уровень вложенности"))
 
             # Поиск закрывающего блока
@@ -77,7 +73,8 @@ class Interpreter:
         returned_code = []
         for index, line in enumerate(code):
             res = self._parse_line(line, return_code=return_code)
-            returned_code.append(res)
+            if res:
+                returned_code.append(res)
 
         if return_code:
             return returned_code
@@ -96,7 +93,8 @@ class Interpreter:
 
                 res = eval(f"{command_data[0]}(*{args})")
                 if not return_code:
-                    self._code_buffer.append(res)
+                    if res:
+                        self._code_buffer.append(res)
                 else:
                     return res
                 break
@@ -131,6 +129,8 @@ class Interpreter:
     def move_player(self, direction, steps) -> tuple[str, int]:
         try:
             steps = int(steps)
+            if steps not in range(*self.__config["LIMITATIONS"]["int_values"]):
+                self._error_buffer.append((-1, "Указано неверное значение для числа"))
         except ValueError:
             try:
                 steps = self._variables[steps]
@@ -141,6 +141,15 @@ class Interpreter:
         return direction, steps
 
     def set_program_variable(self, name, value):
+        try:
+            value = int(value)
+            if value not in range(*self.__config["LIMITATIONS"]["int_values"]):
+                self._error_buffer.append((-1, "Указано неверное значение для числа"))
+        except ValueError:
+            try:
+                value = self._variables[value]
+            except KeyError:
+                self._error_buffer.append((-1, "Использование необъявленной переменной"))
         self._variables[name] = value
 
     def do_if(self, direction, *code):
@@ -148,7 +157,7 @@ class Interpreter:
 
     def call_procedure(self, procedure_name):
         if procedure_name in self._procedures.keys():
-            return self.parse_code(self._procedures[procedure_name], return_code=True)
+            self._code_buffer.extend(self.parse_code(self._procedures[procedure_name], return_code=True))
         else:
             self._error_buffer.append((-1, "Попытка вызова несуществующей функции"))
 
@@ -171,11 +180,13 @@ class Interpreter:
 if __name__ == "__main__":
     interp = Interpreter()
     t = interp.parse_code('''
-LEFT 10
-IFBLOCK RIGHT
-    RIGHT 5
-    LEFT 10
-ENDIF
+PROCEDURE N
+    LEFT 2
+    RIGHT 2
+ENDPROC
+REPEAT 5
+    CALL N
+ENDREPEAT
     '''.split("\n"))
     print(interp.code_buffer)
     print(interp.error_buffer)

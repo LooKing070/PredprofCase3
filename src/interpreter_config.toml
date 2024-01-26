@@ -4,10 +4,14 @@
 "[ \t]*DOWN[ \t]+[0-9a-zA-Z]+" = ["self.move_player", "DOWN", 1]
 "[ \t]*LEFT[ \t]+[0-9a-zA-Z]+" = ["self.move_player", "LEFT", 1]
 "[ \t]*RIGHT[ \t]+[0-9a-zA-Z]+" = ["self.move_player", "RIGHT", 1]
-"[ \t]*SET[ \t]*[a-zA-Z]+[ \t]*=[ \t]*[0-9]+" = ["self.set_program_variable", 1, 2]
+"[ \t]*SET[ \t]*[a-zA-Z]+[ \t]*=[ \t]*[0-9a-zA-Z]+" = ["self.set_program_variable", 1, 2]
 "[ \t]*CALL[ \t]+[a-zA-Z]+" = ["self.call_procedure", 1]
 
 [DOUBLE_KEYWORDS]
 "[ \t]*REPEAT[ \t]+[0-9]+" = "[ \t]*ENDREPEAT"
 "[ \t]*(IFBLOCK)[ \t]+(LEFT|RIGHT|UP|DOWN)" = "[ \t]*ENDIF"
 "[ \t]*PROCEDURE [a-zA-Z]+" = "[ \t]*ENDPROC"
+
+[LIMITATIONS]
+int_values = [1, 1000]
+block_depth = 3
