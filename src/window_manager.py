@@ -6,7 +6,7 @@ from level_loader import level_builder
 from interpreter import Interpreter
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QDialog, QInputDialog, QWidget, \
-    QPlainTextEdit, QHBoxLayout, QFileDialog, QMessageBox, QApplication
+    QPlainTextEdit, QHBoxLayout, QFileDialog, QMessageBox, QApplication, QDesktopWidget
 
 
 class MyWidget(QMainWindow, Ui_Soft):
@@ -21,9 +21,11 @@ class MyWidget(QMainWindow, Ui_Soft):
         self.setWindowTitle('Собственный интерпретатор')
         self.origin_style = self.styleSheet()
         self.tema = 'white'
-        size = QApplication.desktop().availableGeometry().size()
-        self.setFixedSize(size)
+        screen_geometry = QDesktopWidget().screenGeometry()
+        self.setGeometry(screen_geometry)
 
+        # Показываем окно в полноэкранном режиме
+        self.showMaximized()
 
         con = sqlite3.connect("sql_bd.db")
         cur = con.cursor()
@@ -163,11 +165,12 @@ class MyWidget(QMainWindow, Ui_Soft):
 
     def give_text_to_interpreter(self):
         numb_wind = self.tabWidget.currentIndex()
+        self.plainTextEdit.setPlainText('')
         if numb_wind != self.tabWidget.count() - 1:
             self.interpreter.parse_code(self.tabWidget.widget(numb_wind).text.toPlainText().split('\n'))
             errors = self.interpreter.error_buffer
             if errors:
-                print(errors)
+                self.plainTextEdit.setPlainText(errors[1])
             else:
                 self.baseWindow.run_state(state="run", commands=self.interpreter.code_buffer)
 
