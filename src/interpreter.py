@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 import re
+
+
 # TODO добавить ошибки при парсинге строки кода
-# TODO добавить использование переменных
 # TODO запуск действий игрока
 
 
@@ -12,6 +15,8 @@ class Interpreter:
 
         self.__config = None
         self.reload_config()
+
+        self._code_buffer = []
 
     def parse_code(self, code: list[str]) -> tuple[int, str] | None:
         if not any(line.strip() for line in code):
@@ -51,6 +56,8 @@ class Interpreter:
         # block_pairs.sort(key=lambda pair: pair[1]-pair[0])
         def open_pairs(pairs: list[list[int, int]]) -> None:
             nonlocal code
+            if not pairs:
+                return
             pair = pairs[0]
             code_block = code[pair[0]:pair[1] + 1]
             decoded_block = self._decode_block(code_block)
@@ -61,10 +68,7 @@ class Interpreter:
                     mod_pair[0] += length_difference
                 if mod_pair[1] > pair[0]:
                     mod_pair[1] += length_difference
-            try:
-                open_pairs(pairs[1:])
-            except IndexError:
-                pass
+            open_pairs(pairs[1:])
 
         open_pairs(block_pairs)
 
@@ -136,20 +140,25 @@ class Interpreter:
         else:
             print("Попытка вызова несуществующей функции")
 
+    @property
+    def code_buffer(self) -> list[str]:
+        t = self._code_buffer.copy()
+        self._code_buffer.clear()
+        return t
 
 
 if __name__ == "__main__":
     interp = Interpreter()
     error_code = interp.parse_code('''
 LEFT 99999
-SET N=500
+SET M=500
 PROCEDURE N
     LEFT 2
     RIGHT 2
 ENDPROC
 REPEAT 2
     LEFT 2
-    LEFT N
+    LEFT M
     IFBLOCK LEFT
         LEFT 999
         RIGHT 998
@@ -158,6 +167,7 @@ REPEAT 2
     LEFT 4
     LEFT 5
 ENDREPEAT
+CALL N
 LEFT 9999
     '''.split("\n"))
     print("\n", *error_code, sep="\n")

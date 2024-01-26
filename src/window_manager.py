@@ -3,6 +3,7 @@ from PyQt5.QtCore import Qt
 from designs.maket_prototype import Ui_Soft
 from board import GameLogic
 from level_loader import level_builder
+from interpreter import Interpreter
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QDialog, QInputDialog, QWidget, \
     QPlainTextEdit, QHBoxLayout, QFileDialog, QMessageBox, QApplication
@@ -13,6 +14,7 @@ class MyWidget(QMainWindow, Ui_Soft):
         super().__init__()
         self.setupUi(self, QMainWindow, level_builder("21 21"), 21 * 21)
         self.baseWindow = GameLogic(self.gridLayout, 0)
+        self.interpreter = Interpreter()
 
         self.setWindowTitle('Собственный интерпретатор')
         self.orogin_palete = self.palette()
