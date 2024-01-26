@@ -24,6 +24,7 @@ class MyWidget(QMainWindow, Ui_Soft):
         size = QApplication.desktop().availableGeometry().size()
         self.setFixedSize(size)
 
+
         con = sqlite3.connect("sql_bd.db")
         cur = con.cursor()
         for lst in cur.execute('''SELECT * FROM files''').fetchall():
@@ -182,14 +183,13 @@ class Window_In_QTabWidget(QWidget):
         self.numbers_lines.setMaximumWidth(40)
         self.numbers_lines.setReadOnly(True)
         self.numbers_lines.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.text = QPlainTextEdit()
+        self.text = CustomPlainTextEdit()
         self.text.setPlainText(text)
         layout.addWidget(self.numbers_lines)
         layout.addWidget(self.text)
         self.setLayout(layout)
         self.name = name
         self.save_text_and_update_numbers()
-
         self.text.textChanged.connect(self.save_text_and_update_numbers)
 
     def save_text_and_update_numbers(self):
@@ -200,3 +200,20 @@ class Window_In_QTabWidget(QWidget):
                         SET content = ?
                         WHERE name = ?""", (self.text.toPlainText(), self.name))
         con.commit()
+
+
+class CustomPlainTextEdit(QPlainTextEdit):
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Tab:
+            cursor = self.textCursor()
+            selected_text = cursor.selectedText()
+            if selected_text:
+                # Если есть выбранный текст, добавляем 4 пробела в каждую строку выделенного текста
+                lines = selected_text.split('n')
+                new_text = 'n'.join(['    ' + line for line in lines])
+                cursor.insertText(new_text)
+            else:
+                # Если нет выбранного текста, вставляем 4 пробела в текущую позицию курсора
+                cursor.insertText('    ')
+        else:
+            super().keyPressEvent(event)
