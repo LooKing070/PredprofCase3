@@ -96,7 +96,7 @@ class GameLogic(QWidget):
             for _ in range(command_tuple[1]):
                 self.troll_move(command_tuple[0])
             self.command_n += 1
-            print(animation, command_tuple, self.command_n)
+            print(self.levelStructure[self.trollPosition[1]])
         elif animation == "loose":
             self.animationTimer.stop()
             self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]).widget().raise_()
@@ -105,7 +105,7 @@ class GameLogic(QWidget):
 
     def run_result(self, result):
         self.animationTimer.stop()
-        self.command_n = 0
+        self.command_n = -1
         if result:
             return "you escaped"
         self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]).widget().raise_()
