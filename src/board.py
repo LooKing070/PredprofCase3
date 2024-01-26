@@ -16,11 +16,10 @@ class GameLogic(QWidget):
         self.looseTimer.timeout.connect(lambda: self.run_result(False))
         # self.animationTimer.timeout.connect(lambda: self.animan("exitButton"))
         self.looseTimer.start()
-        self.animationTimer.start()
         # геймплейные параметры
         self.gridLayout = ui
         self.levelStructure = [[j for j in i.rstrip()] for i in levelStructure]
-        self.trollPosition = [len(self.levelStructure[0]) // 2, len(self.levelStructure) - 2]
+        self.trollPosition = [0, 0]
         self.troll = self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0])
         self.command_n = 0
 
@@ -96,7 +95,6 @@ class GameLogic(QWidget):
             for _ in range(command_tuple[1]):
                 self.troll_move(command_tuple[0])
             self.command_n += 1
-            print(self.levelStructure[self.trollPosition[1]])
         elif animation == "loose":
             self.animationTimer.stop()
             self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]).widget().raise_()
@@ -112,12 +110,12 @@ class GameLogic(QWidget):
         self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]) \
             .widget().setPixmap(QPixmap("textures/PredInterpreterW.jpg"))
         self.animationTimer.timeout.connect(lambda: self.animan("loose"))
-        self.animationTimer.start()
+        self.animationTimer.start(500)
         return "you banned"
 
     def run_state(self, state="run", commands=(("IF LEFT", 1), ("IF RIGHT", 1), ("IF UP", 1), ("IF DOWN", 1))):
         if state == "run":
             self.animationTimer.timeout.connect(lambda: self.animan("walk", commands[self.command_n], len(commands)))
-            self.animationTimer.start()
+            self.animationTimer.start(500)
         elif state == "stop":
             self.run_result(False)
