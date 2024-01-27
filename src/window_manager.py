@@ -15,7 +15,7 @@ class MyWidget(QMainWindow, Ui_Soft):
         # 1 загрузка
         with open(f"levels/structure{0}.txt", "r") as u:
             levelStructure = u.readlines()
-            self.baseWindow = self.setupUi(self, QMainWindow, levelStructure, 21 * 21)
+            self.baseWindow = self.setupUi(self, QMainWindow, levelStructure, len(levelStructure) * len(levelStructure[0]))
         self.interpreter = Interpreter()
 
         self.setWindowTitle('Собственный интерпретатор')
@@ -182,7 +182,7 @@ class MyWidget(QMainWindow, Ui_Soft):
             self.playZone.deleteLater()
             with open(f"levels/structure{0}.txt", "r") as u:
                 levelStructure = u.readlines()
-                add_play_zone(self, levelStructure, 21*21)
+                add_play_zone(self, levelStructure, len(levelStructure) * len(levelStructure[0]))
             self.gameWindow = GameLogic(self.gridLayout, 0)
             self.gameWindow.run_state(state=status, commands=self.interpreter.code_buffer)
         except AttributeError as ae:
