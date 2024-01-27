@@ -5,7 +5,7 @@ from PyQt5.QtCore import QTimer
 
 
 class GameLogic(QWidget):
-    def __init__(self, ui, level):
+    def __init__(self, ui, level, terminal):
         super(GameLogic, self).__init__()
         with open(f"levels/structure{level}.txt", "r") as u:
             levelStructure = u.readlines()
@@ -16,6 +16,7 @@ class GameLogic(QWidget):
         self.looseTimer.timeout.connect(lambda: self.animan("loose"))
         # геймплейные параметры
         self.gridLayout = ui
+        self.vivod = terminal
         self.levelStructure = [[j for j in i.rstrip()] for i in levelStructure]
         self.trollPosition = [0, 0]
         self.troll = self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0])
@@ -25,33 +26,34 @@ class GameLogic(QWidget):
             if self.move_try([self.trollPosition[0], self.trollPosition[1] - 1]):
                 self.troll_moving((0, -1))
             else:
-                return "troll не может ходить в стену или убегать с поля"
+                self.run_state("fieldError")
         elif sender == "LEFT":
             if self.move_try([self.trollPosition[0] - 1, self.trollPosition[1]]):
                 self.troll_moving((-1, 0))
             else:
-                return "troll не может ходить в стену или убегать с поля"
+                self.run_state("fieldError")
         elif sender == "RIGHT":
             if self.move_try([self.trollPosition[0] + 1, self.trollPosition[1]]):
                 self.troll_moving((1, 0))
             else:
-                return "troll не может ходить в стену или убегать с поля"
+                self.run_state("fieldError")
         elif sender == "DOWN":
             if self.move_try([self.trollPosition[0], self.trollPosition[1] + 1]):
                 self.troll_moving((0, 1))
             else:
-                return "troll не может ходить в стену или убегать с поля"
+                self.run_state("fieldError")
         elif sender == "IF LEFT":
-            return self.move_try([self.trollPosition[0] - 1, self.trollPosition[1]])
+            return not self.move_try([self.trollPosition[0] - 1, self.trollPosition[1]])
         elif sender == "IF RIGHT":
-            return self.move_try([self.trollPosition[0] + 1, self.trollPosition[1]])
+            return not self.move_try([self.trollPosition[0] + 1, self.trollPosition[1]])
         elif sender == "IF UP":
-            return self.move_try([self.trollPosition[0], self.trollPosition[1] - 1])
+            return not self.move_try([self.trollPosition[0], self.trollPosition[1] - 1])
         elif sender == "IF DOWN":
-            return self.move_try([self.trollPosition[0], self.trollPosition[1] + 1])
+            return not self.move_try([self.trollPosition[0], self.trollPosition[1] + 1])
 
     def move_try(self, sector_x_y):  # что произойдёт, если игрок куда-то пойдёт
-        if sector_x_y[0] < 0 or 21 < sector_x_y[0] or sector_x_y[1] < 0 or 21 < sector_x_y[1]:
+        if sector_x_y[0] < 0 or sector_x_y[0] >= len(self.levelStructure[0])\
+                or sector_x_y[1] < 0 or sector_x_y[1] >= len(self.levelStructure):
             return False
         elif self.levelStructure[sector_x_y[1]][sector_x_y[0]] == "W":
             return False
@@ -87,13 +89,18 @@ class GameLogic(QWidget):
             exec(f'self.hummer{i}.show()')
             exec(f'self.gridLayout.addWidget(self.hummer{i}, {y}, {x}, 1, 1)')"""
 
-    def animan(self, animation, command_tuple=None, comms_len=999):
+    def animan(self, animation, command_tuple=None, comms_len=999, commands=0):
         if animation == "walk":
+            print(commands)
             if comms_len:
-                for _ in range(command_tuple[1]):
-                    self.troll_move(command_tuple[0])
+                if type(command_tuple[0]) is tuple:
+                    if self.troll_move(command_tuple[0][0]):
+                        print(command_tuple[1])
+                else:
+                    for _ in range(command_tuple[1]):
+                        self.troll_move(command_tuple[0])
             else:
-                self.run_result(True)
+                self.vivod.setPlainText(self.run_result(True))
         elif animation == "loose":
             self.looseTimer.stop()
             self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]).widget().raise_()
@@ -102,17 +109,22 @@ class GameLogic(QWidget):
 
     def run_result(self, result):
         self.animationTimer.stop()
-        if result:
-            return "you escaped"
+        if result == "fieldError":
+            return "troll не может ходить в стену или убегать с поля"
+        elif result:
+            return "выполнено успешно"
         self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]).widget().raise_()
         self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]) \
             .widget().setPixmap(QPixmap("textures/PredInterpreterW.jpg"))
         self.looseTimer.start()
-        return "you banned"
+        return "исполнение завершено досрочно"
 
     def run_state(self, state="run", commands=(("IF LEFT", 1), ("IF RIGHT", 1), ("IF UP", 1), ("IF DOWN", 1))):
         if state == "run":
-            self.animationTimer.timeout.connect(lambda: self.animan("walk", commands.pop(0), len(commands)))
+            commands.append(commands[-1])
+            self.animationTimer.timeout.connect(lambda: self.animan("walk", commands.pop(0), len(commands), commands))
             self.animationTimer.start(500)
         elif state == "stop":
-            self.run_result(False)
+            self.vivod.setPlainText(self.run_result(False))
+        elif state == "fieldError":
+            self.vivod.setPlainText(self.run_result("fieldError"))

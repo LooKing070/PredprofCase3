@@ -15,7 +15,8 @@ class MyWidget(QMainWindow, Ui_Soft):
         # 1 загрузка
         with open(f"levels/structure{0}.txt", "r") as u:
             levelStructure = u.readlines()
-            self.baseWindow = self.setupUi(self, QMainWindow, levelStructure, len(levelStructure) * len(levelStructure[0]))
+            self.baseWindow = self.setupUi(self, QMainWindow, levelStructure,
+                                           len(levelStructure) * len(levelStructure[0]))
         self.interpreter = Interpreter()
 
         self.setWindowTitle('Собственный интерпретатор')
@@ -176,21 +177,14 @@ class MyWidget(QMainWindow, Ui_Soft):
                 self.run_game("run")
 
     def run_game(self, status):
-        try:
-            self.verticalLayout.removeItem(self.gridLayout)
-            self.gridLayout.deleteLater()
-            self.playZone.deleteLater()
-            with open(f"levels/structure{0}.txt", "r") as u:
-                levelStructure = u.readlines()
-                add_play_zone(self, levelStructure, len(levelStructure) * len(levelStructure[0]))
-            self.gameWindow = GameLogic(self.gridLayout, 0)
-            self.gameWindow.run_state(state=status, commands=self.interpreter.code_buffer)
-        except AttributeError as ae:
-            self.gameWindow.run_state(state="stop", commands=("IF LEFT", 1))
-            self.plainTextEdit.setPlainText("Нельзя убегать с поля")
-        except IndexError as ie:
-            self.gameWindow.run_state(state="stop", commands=("IF LEFT", 1))
-            self.plainTextEdit.setPlainText("Нельзя убегать с поля")
+        self.verticalLayout.removeItem(self.gridLayout)
+        self.gridLayout.deleteLater()
+        self.playZone.deleteLater()
+        with open(f"levels/structure{0}.txt", "r") as u:
+            levelStructure = u.readlines()
+            add_play_zone(self, levelStructure, len(levelStructure) * len(levelStructure[0]))
+        self.gameWindow = GameLogic(self.gridLayout, 0, self.plainTextEdit)
+        self.gameWindow.run_state(state=status, commands=self.interpreter.code_buffer)
 
 
 class Window_In_QTabWidget(QWidget):
