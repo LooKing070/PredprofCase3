@@ -27,22 +27,22 @@ class GameLogic(QWidget):
             if self.move_try([self.trollPosition[0], self.trollPosition[1] - 1]):
                 self.troll_moving((0, -1))
             else:
-                self.plainTextEdit.setText("troll не может ходить в стену или убегать с поля")
+                return "troll не может ходить в стену или убегать с поля"
         elif sender == "LEFT":
             if self.move_try([self.trollPosition[0] - 1, self.trollPosition[1]]):
                 self.troll_moving((-1, 0))
             else:
-                self.plainTextEdit.setText("troll не может ходить в стену или убегать с поля")
+                return "troll не может ходить в стену или убегать с поля"
         elif sender == "RIGHT":
             if self.move_try([self.trollPosition[0] + 1, self.trollPosition[1]]):
                 self.troll_moving((1, 0))
             else:
-                self.plainTextEdit.setText("troll не может ходить в стену или убегать с поля")
+                return "troll не может ходить в стену или убегать с поля"
         elif sender == "DOWN":
             if self.move_try([self.trollPosition[0], self.trollPosition[1] + 1]):
                 self.troll_moving((0, 1))
             else:
-                self.plainTextEdit.setText("troll не может ходить в стену или убегать с поля")
+                return "troll не может ходить в стену или убегать с поля"
         elif sender == "IF LEFT":
             return self.move_try([self.trollPosition[0] - 1, self.trollPosition[1]])
         elif sender == "IF RIGHT":
