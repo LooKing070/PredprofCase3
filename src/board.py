@@ -12,10 +12,8 @@ class GameLogic(QWidget):
         # таймеры
         self.looseTimer, self.animationTimer = QTimer(), QTimer()
         self.animationTimer.setInterval(500)
-        self.looseTimer.setInterval(1000000)
-        self.looseTimer.timeout.connect(lambda: self.run_result(False))
-        # self.animationTimer.timeout.connect(lambda: self.animan("exitButton"))
-        self.looseTimer.start()
+        self.looseTimer.setInterval(700)
+        self.looseTimer.timeout.connect(lambda: self.animan("loose"))
         # геймплейные параметры
         self.gridLayout = ui
         self.levelStructure = [[j for j in i.rstrip()] for i in levelStructure]
@@ -97,10 +95,10 @@ class GameLogic(QWidget):
             else:
                 self.run_result(True)
         elif animation == "loose":
-            self.animationTimer.stop()
+            self.looseTimer.stop()
             self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]).widget().raise_()
             self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]) \
-                .widget().setPixmap(QPixmap("textures/PredInterpreterT.jpg"))
+                .widget().setPixmap(QPixmap("textures/PredInterpreterS.jpg"))
 
     def run_result(self, result):
         self.animationTimer.stop()
@@ -109,8 +107,7 @@ class GameLogic(QWidget):
         self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]).widget().raise_()
         self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]) \
             .widget().setPixmap(QPixmap("textures/PredInterpreterW.jpg"))
-        self.animationTimer.timeout.connect(lambda: self.animan("loose"))
-        self.animationTimer.start(500)
+        self.looseTimer.start()
         return "you banned"
 
     def run_state(self, state="run", commands=(("IF LEFT", 1), ("IF RIGHT", 1), ("IF UP", 1), ("IF DOWN", 1))):

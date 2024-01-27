@@ -1,9 +1,10 @@
 import logging
 import sys
 from PyQt5.QtWidgets import QApplication
+from PyQt5.QtGui import QIcon
 import window_manager
 
-# self.settingsWindow.setWindowIcon(QIcon("../icons/AirBanIcon.jpg"))
+
 
 logging.basicConfig(filename="logs",
                     filemode='w',
@@ -15,6 +16,7 @@ logging.basicConfig(filename="logs",
 def main():
     app = QApplication(sys.argv)
     ex = window_manager.MyWidget()
+    ex.setWindowIcon(QIcon("icons/PredInterpreter.jpg"))
     ex.show()
     sys.excepthook = except_hook
     sys.exit(app.exec_())

@@ -192,6 +192,7 @@ class MyWidget(QMainWindow, Ui_Soft):
             self.gameWindow.run_state(state="stop", commands=("IF LEFT", 1))
             self.plainTextEdit.setPlainText("Нельзя убегать с поля")
 
+
 class Window_In_QTabWidget(QWidget):
     def __init__(self, name, text=''):
         super().__init__()
