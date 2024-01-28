@@ -89,13 +89,12 @@ class GameLogic(QWidget):
             exec(f'self.hummer{i}.show()')
             exec(f'self.gridLayout.addWidget(self.hummer{i}, {y}, {x}, 1, 1)')"""
 
-    def animan(self, animation, command_tuple=None, comms_len=999, commands=0):
+    def animan(self, animation, command_tuple=None):
         if animation == "walk":
-            print(commands)
-            if comms_len:
+            if len(self.commands):
                 if type(command_tuple[0]) is tuple:
                     if self.troll_move(command_tuple[0][0]):
-                        print(command_tuple[1])
+                        self.commands = command_tuple[1] + self.commands
                 else:
                     for _ in range(command_tuple[1]):
                         self.troll_move(command_tuple[0])
@@ -121,8 +120,9 @@ class GameLogic(QWidget):
 
     def run_state(self, state="run", commands=(("IF LEFT", 1), ("IF RIGHT", 1), ("IF UP", 1), ("IF DOWN", 1))):
         if state == "run":
-            commands.append(commands[-1])
-            self.animationTimer.timeout.connect(lambda: self.animan("walk", commands.pop(0), len(commands), commands))
+            self.commands = commands
+            self.commands.append(commands[-1])
+            self.animationTimer.timeout.connect(lambda: self.animan("walk", self.commands.pop(0)))
             self.animationTimer.start(500)
         elif state == "stop":
             self.vivod.setPlainText(self.run_result(False))

@@ -5,7 +5,6 @@ from PyQt5.QtGui import QIcon
 import window_manager
 
 
-
 logging.basicConfig(filename="logs",
                     filemode='w',
                     format='%(asctime)s %(filename)s: %(levelname)s "%(message)s" at line %(lineno)d',
