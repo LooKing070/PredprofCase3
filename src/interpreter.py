@@ -74,7 +74,10 @@ class Interpreter:
         for index, line in enumerate(code):
             res = self._parse_line(line, return_code=return_code)
             if res:
-                returned_code.append(res)
+                if type(res) is list:
+                    returned_code.extend(res)
+                else:
+                    returned_code.append(res)
 
         if return_code:
             return returned_code
@@ -94,7 +97,10 @@ class Interpreter:
                 res = eval(f"{command_data[0]}(*{args})")
                 if not return_code:
                     if res:
-                        self._code_buffer.append(res)
+                        if type(res) is list:
+                            self._code_buffer.extend(res)
+                        else:
+                            self._code_buffer.append(res)
                 else:
                     return res
                 break
@@ -117,7 +123,7 @@ class Interpreter:
             return code_block[1:-1] * int(code_block[0].split()[1])
         if code_block[0].strip().startswith("PROCEDURE"):
             self._procedures[code_block[0].split()[1]] = code_block[1:-1]
-            return []
+            return [""]
         if code_block[0].strip().startswith("IFBLOCK"):
             return [f"self.do_if('{code_block[0].split()[1]}', {code_block[1:-1]})"]
 
@@ -157,7 +163,7 @@ class Interpreter:
 
     def call_procedure(self, procedure_name):
         if procedure_name in self._procedures.keys():
-            self._code_buffer.extend(self.parse_code(self._procedures[procedure_name], return_code=True))
+            return self.parse_code(self._procedures[procedure_name], return_code=True)
         else:
             self._error_buffer.append((-1, "Попытка вызова несуществующей функции"))
 

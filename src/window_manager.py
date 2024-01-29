@@ -177,6 +177,7 @@ class MyWidget(QMainWindow, Ui_Soft):
                 self.run_game("run")
 
     def run_game(self, status):
+        code = self.interpreter.code_buffer
         self.verticalLayout.removeItem(self.gridLayout)
         self.gridLayout.deleteLater()
         self.playZone.deleteLater()
@@ -184,7 +185,7 @@ class MyWidget(QMainWindow, Ui_Soft):
             levelStructure = u.readlines()
             add_play_zone(self, levelStructure, len(levelStructure) * len(levelStructure[0]))
         self.gameWindow = GameLogic(self.gridLayout, 0, self.plainTextEdit)
-        self.gameWindow.run_state(state=status, commands=self.interpreter.code_buffer)
+        self.gameWindow.run_state(state=status, commands=code)
 
 
 class Window_In_QTabWidget(QWidget):
