@@ -104,6 +104,7 @@ class Ui_Soft(object):
                 column += 1
         self.verticalLayout.addWidget(self.playZone)
         self.plainTextEdit = QtWidgets.QPlainTextEdit(self.boardWigets)
+        self.plainTextEdit.setReadOnly(True)
         self.plainTextEdit.setMaximumSize(QtCore.QSize(16777215, 250))
         self.plainTextEdit.setObjectName("plainTextEdit")
         self.verticalLayout.addWidget(self.plainTextEdit)

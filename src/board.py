@@ -109,14 +109,14 @@ class GameLogic(QWidget):
     def run_result(self, result):
         self.animationTimer.stop()
         if result == "fieldError":
-            return "troll не может ходить в стену или убегать с поля"
+            return "Troll не может ходить в стену или убегать с поля"
         elif result:
-            return "выполнено успешно"
+            return "Выполнено успешно"
         self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]).widget().raise_()
         self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]) \
             .widget().setPixmap(QPixmap("textures/PredInterpreterW.jpg"))
         self.looseTimer.start()
-        return "исполнение завершено досрочно"
+        return "Исполнение завершено досрочно"
 
     def run_state(self, state="run", commands=(("IF LEFT", 1), ("IF RIGHT", 1), ("IF UP", 1), ("IF DOWN", 1))):
         if state == "run":

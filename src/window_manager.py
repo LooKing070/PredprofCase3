@@ -163,6 +163,8 @@ class MyWidget(QMainWindow, Ui_Soft):
     def update_shrift_up_menu(self):
         font, ok_pressed = QtWidgets.QFontDialog.getFont()
         if ok_pressed:
+            if font.pointSize() > 20:
+                font.setPointSize(20)
             self.setStyleSheet(self.origin_style)
             self.setFont(font)
             if self.tema == 'black':
