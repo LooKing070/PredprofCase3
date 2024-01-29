@@ -1,12 +1,14 @@
 import sqlite3
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QFont
+
 from designs.maket_prototype import Ui_Soft
 from board import GameLogic
 from level_loader import level_builder, add_play_zone
 from interpreter import Interpreter
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QDialog, QInputDialog, QWidget, \
-    QPlainTextEdit, QHBoxLayout, QFileDialog, QMessageBox, QApplication, QDesktopWidget
+    QPlainTextEdit, QHBoxLayout, QFileDialog, QMessageBox, QApplication, QDesktopWidget, QVBoxLayout, QTextEdit
 
 
 class MyWidget(QMainWindow, Ui_Soft):
@@ -47,6 +49,7 @@ class MyWidget(QMainWindow, Ui_Soft):
         self.action_8.triggered.connect(self.delete_file_up_menu)  # удалить файл из приложения
         self.action_13.triggered.connect(self.update_tema_up_menu)  # удалить файл из приложения
         self.action_15.triggered.connect(self.update_shrift_up_menu)  # удалить файл из приложения
+        self.action_9.triggered.connect(self.o_programm_up_menu)
 
         # запуск и остановка кода
         self.runButton.clicked.connect(self.give_text_to_interpreter)
@@ -165,6 +168,10 @@ class MyWidget(QMainWindow, Ui_Soft):
             if self.tema == 'black':
                 self.setStyleSheet(open('designs/style_dark.qss').read())
 
+    def o_programm_up_menu(self):
+        self.text = TheoryWindow()
+        self.text.show()
+
     def give_text_to_interpreter(self):
         numb_wind = self.tabWidget.currentIndex()
         self.plainTextEdit.setPlainText('')
@@ -233,3 +240,47 @@ class CustomPlainTextEdit(QPlainTextEdit):
                 cursor.insertText('    ')
         else:
             super().keyPressEvent(event)
+
+
+class TheoryWindow(QWidget):  # окно с теорией
+    def __init__(self, theory: str = "О программе"):
+        super().__init__()
+        self.initUI(theory)
+
+    def initUI(self, theory: str):
+        self.content = '''
+        Демонстрация работы 
+        вклалдки "о приложении"
+        '''
+
+        self.setWindowTitle(theory)
+        self.setGeometry(500, 150, 800, 800)
+        layout = QVBoxLayout()
+
+        self.text_edit = QTextEdit(self)
+        self.shrift_size = 16
+        font = QFont()
+        font.setPointSize(self.shrift_size)
+        self.text_edit.setFont(font)
+        self.text_edit.setText(self.content)
+        self.text_edit.setReadOnly(True)
+
+        layout.addWidget(self.text_edit)
+        self.setLayout(layout)
+        self.show()
+
+
+    def wheelEvent(self, event):
+        try:
+            if event.angleDelta().y() > 0 and QApplication.keyboardModifiers() == Qt.ControlModifier:
+                self.shrift_size = min(self.shrift_size + 1, 30)
+                font = QFont()
+                font.setPointSize(self.shrift_size)
+                self.text_edit.setFont(font)
+            elif event.angleDelta().y() <= 0 and QApplication.keyboardModifiers() == Qt.ControlModifier:
+                self.shrift_size = max(self.shrift_size - 1, 10)
+                font = QFont()
+                font.setPointSize(self.shrift_size)
+                self.text_edit.setFont(font)
+        except Exception as ex:
+            print(ex)
