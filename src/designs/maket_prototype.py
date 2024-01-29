@@ -147,6 +147,8 @@ class Ui_Soft(object):
         self.action_6.setObjectName("action_6")
         self.action_8 = QtWidgets.QAction(Soft)
         self.action_8.setObjectName("action_8")
+        self.action_9 = QtWidgets.QAction(Soft)
+        self.action_9.setObjectName("action_8")
         self.menu.addSeparator()
         self.menu.addAction(self.action_2)
         self.menu.addSeparator()
@@ -160,6 +162,8 @@ class Ui_Soft(object):
         self.menu_2.addAction(self.action_13)
         self.menu_2.addSeparator()
         self.menu_2.addAction(self.action_15)
+        self.menu_2.addSeparator()
+        self.menu_2.addAction(self.action_9)
         self.menu_2.addSeparator()
         self.menuBar.addAction(self.menu.menuAction())
         self.menuBar.addAction(self.menu_2.menuAction())
@@ -188,4 +192,5 @@ class Ui_Soft(object):
         self.action_3.setText(_translate("Soft", "Открыть"))
         self.action_6.setText(_translate("Soft", "Сохранить как"))
         self.action_8.setText(_translate("Soft", "Удалить"))
+        self.action_9.setText(_translate("Soft", "О приложении"))
 
