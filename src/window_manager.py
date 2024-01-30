@@ -27,19 +27,11 @@ class MyWidget(QMainWindow, Ui_Soft):
         self.tema = 'white'
         screen_geometry = QDesktopWidget().screenGeometry()
         self.setGeometry(screen_geometry)
+        self.start_settings()
 
         # Показываем окно в полноэкранном режиме
         self.showMaximized()
 
-        con = sqlite3.connect("sql_bd.db")
-        cur = con.cursor()
-        for lst in cur.execute('''SELECT * FROM files''').fetchall():
-            widget = Window_In_QTabWidget(lst[0], lst[1])
-            self.tabWidget.insertTab(self.tabWidget.count() - 1, widget, lst[0])
-        con.commit()
-        con.close()
-
-        self.tabWidget.setCurrentIndex(0)
         # self.boardWigets.setAlignment(Qt.AlignCenter)
 
         self.tabWidget.tabBarClicked.connect(
@@ -202,6 +194,28 @@ class MyWidget(QMainWindow, Ui_Soft):
         self.gameWindow = GameLogic(self.gridLayout, 0, self.plainTextEdit)
         self.gameWindow.run_state(state=status, commands=code)
 
+    def start_settings(self):
+        conn = sqlite3.connect("sql_bd.db")
+        cursor = conn.cursor()
+        cursor.execute('''CREATE TABLE IF NOT EXISTS files
+                          (name TEXT,
+                          content TEXT)''')
+        conn.commit()
+        con = sqlite3.connect("sql_bd.db")
+        cur = con.cursor()
+        cur.execute(f"""INSERT INTO files VALUES ('main', '')""")
+        con.commit()
+        conn.close()
+
+        con = sqlite3.connect("sql_bd.db")
+        cur = con.cursor()
+        for lst in cur.execute('''SELECT * FROM files''').fetchall():
+            widget = Window_In_QTabWidget(lst[0], lst[1])
+            self.tabWidget.insertTab(self.tabWidget.count() - 1, widget, lst[0])
+        con.commit()
+        con.close()
+        self.tabWidget.setCurrentIndex(0)
+
 
 class Window_In_QTabWidget(QWidget):
     def __init__(self, name, text=''):
@@ -256,10 +270,30 @@ class TheoryWindow(QWidget):  # окно с теорией
         self.initUI(theory)
 
     def initUI(self, theory: str):
-        self.content = '''
-        Демонстрация работы 
-        вклалдки "о приложении"
-        '''
+        self.content = """Использование
+Слева вы можете видеть поле для ввода команд со следующим синтаксисом:
+
+UP (число шагов) - перемещение вверх на число шагов
+DOWN (число шагов) - перемещение вниз на число шагов
+RIGHT (число шагов) - перемещение вправо на число шагов
+LEFT (число шагов) - перемещение влево на число шагов
+
+IFBLOCK (направление) - проверяет, есть ли препятствие на следующем секторе по направлению
+(здесь пишем, что выполнить если условие верно)
+ENDIF - закрывает проверяющий блок
+
+REPEAT (количество раз) - повторить код указанное количество раз
+(здесь пишем, что выполнить N раз)
+ENDREPEAT - закрывает блок цикла
+
+PROCEDURE (имя) - выполняет код внутри себя, когда вызвали по имени
+(здесь пишем код)
+ENDPROC - закрывает блок функции
+
+CALL (имя) - вызывает процедуру/функцию по имени
+SET (имя) = (число)- устанавливает в переменную с именем натуральное число
+
+Справа находится поле (21х21) с исполнителем. Нажмите на кнопку run, чтобы начать выполнять код, stop, чтобы завершить его выполнение досрочно. Все возможные ошибки будут отображаться в терминале, под полем с исполнителем."""
 
         self.setWindowTitle(theory)
         self.setGeometry(500, 150, 800, 800)

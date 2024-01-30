@@ -25,10 +25,9 @@ def except_hook(cls, exception, traceback):
     sys.__excepthook__(cls, exception, traceback)
 
 
-if __name__ == "__main__":
-    try:
-        main()
-        logging.info("Программа завершила работу")
-    except Exception as e:
-        print(e)
-        logging.critical(e, exc_info=True)
+try:
+    main()
+    logging.info("Программа завершила работу")
+except Exception as e:
+    logging.critical(e)
+    logging.critical(e, exc_info=True)
