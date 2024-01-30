@@ -173,7 +173,7 @@ class MyWidget(QMainWindow, Ui_Soft):
         self.plainTextEdit.setPlainText('')
         if numb_wind != self.tabWidget.count() - 1:
             try:
-                self.interpreter.parse_code(self.tabWidget.widget(numb_wind).text.toPlainText().split('\n'))
+                self.interpreter.parse_code(self.tabWidget.widget(numb_wind).text.toPlainText().split('\n'), reset=True)
             except Exception as e:
                 errors = self.interpreter.error_buffer
                 self.plainTextEdit.setPlainText(errors[1])

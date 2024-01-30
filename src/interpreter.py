@@ -16,9 +16,10 @@ class Interpreter:
         self._code_buffer = []
         self._error_buffer: list[tuple[int, str]] = []
 
-    def parse_code(self, code: list[str], return_code: bool = False) -> tuple | None:
-        self._variables.clear()
-        self._procedures.clear()
+    def parse_code(self, code: list[str], return_code: bool = False, reset: bool=False) -> tuple | None:
+        if reset:
+            self._variables.clear()
+            self._procedures.clear()
         if not any(line.strip() for line in code):
             self._error_buffer.append((-1, "Код отсутствует"))
         stack = []
