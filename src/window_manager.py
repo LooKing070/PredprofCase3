@@ -3,11 +3,11 @@ import sqlite3
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
 
-from designs.maket_prototype import Ui_Soft
+from maket_prototype import Ui_Soft
 from board import GameLogic
-from level_loader import level_builder, add_play_zone
+from level_loader import add_play_zone
 from interpreter import Interpreter
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QDialog, QInputDialog, QWidget, \
     QPlainTextEdit, QHBoxLayout, QFileDialog, QMessageBox, QApplication, QDesktopWidget, QVBoxLayout, QTextEdit
 
