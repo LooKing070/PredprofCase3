@@ -13,5 +13,5 @@
 "[ \t]*PROCEDURE [a-zA-Z]+" = "[ \t]*ENDPROC"
 
 [LIMITATIONS]
-int_values = [1, 1000]
+int_values = [0, 1000]
 block_depth = 3

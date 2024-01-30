@@ -137,32 +137,39 @@ class Interpreter:
         try:
             steps = int(steps)
             if steps not in range(*self.__config["LIMITATIONS"]["int_values"]):
-                self._error_buffer.append((-1, "Указано неверное значение для числа"))
+                self._error_buffer.append((-1, f"Ошибка значения: указан неверный диапазон {tuple(self.__config["LIMITATIONS"]["int_values"])} для числа"))
         except ValueError:
             try:
                 steps = self._variables[steps]
             except KeyError:
-                self._error_buffer.append((-1, f"Ошибка: использование необъявленной переменной {steps}"))
+                self._error_buffer.append((-1, f"Ошибка переменной: использование необъявленной переменной {steps}"))
         if steps < 1:
             self._error_buffer.append((-1, "Ошибка занчения: величина шага не может быть меньше 1"))
         return direction, steps
 
     def set_program_variable(self, name, value):
         if not value.isdigit():
-            self._error_buffer.append((-1, "Значение переменной может быть только числом"))
+            self._error_buffer.append((-1, "Ошибка переменной: значение переменной может быть только числом"))
         else:
+            value = int(value)
             if value not in range(*self.__config["LIMITATIONS"]["int_values"]):
-                self._error_buffer.append((-1, "Указано неверное значение для числа"))
+                self._error_buffer.append((-1, f"Ошибка значения: указан неверный диапазон {tuple(self.__config["LIMITATIONS"]["int_values"])} для числа"))
             self._variables[name] = value
 
     def do_if(self, direction, *code):
         return (f"IF {direction}", 1), self.parse_code(*code, return_code=True)
 
     def call_procedure(self, procedure_name):
+        procedure_code = self._procedures[procedure_name]
+        for line in procedure_code:
+            if "CALL" in line:
+                if line.split()[1] == procedure_name:
+                    self._error_buffer.append((-1, "Ошибка процедуры: рекурсия не поддерживается в рамках проекта"))
+                    return
         if procedure_name in self._procedures.keys():
             return self.parse_code(self._procedures[procedure_name], return_code=True)
         else:
-            self._error_buffer.append((-1, "Попытка вызова несуществующей функции"))
+            self._error_buffer.append((-1, f"Ошибка процедуры: попытка вызова несуществующей процедуры {procedure_name}"))
 
     @property
     def code_buffer(self) -> list[tuple[str, int]]:
