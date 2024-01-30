@@ -8,7 +8,7 @@
 "[ \t]*CALL[ \t]+[a-zA-Z]+" = ["self.call_procedure", 1]
 
 [DOUBLE_KEYWORDS]
-"[ \t]*REPEAT[ \t]+[0-9]+" = "[ \t]*ENDREPEAT"
+"[ \t]*REPEAT[ \t]+[0-9a-zA-Z]+" = "[ \t]*ENDREPEAT"
 "[ \t]*(IFBLOCK)[ \t]+(LEFT|RIGHT|UP|DOWN)" = "[ \t]*ENDIF"
 "[ \t]*PROCEDURE [a-zA-Z]+" = "[ \t]*ENDPROC"
 

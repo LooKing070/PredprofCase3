@@ -17,6 +17,8 @@ class Interpreter:
         self._error_buffer: list[tuple[int, str]] = []
 
     def parse_code(self, code: list[str], return_code: bool = False) -> tuple | None:
+        self._variables.clear()
+        self._procedures.clear()
         if not any(line.strip() for line in code):
             self._error_buffer.append((-1, "Код отсутствует"))
         stack = []
@@ -121,7 +123,16 @@ class Interpreter:
 
     def _decode_block(self, code_block: list[str]) -> list[str]:
         if code_block[0].strip().startswith("REPEAT"):
-            return code_block[1:-1] * int(code_block[0].split()[1])
+            try:
+                repetitions = int(code_block[0].split()[1])
+            except ValueError:
+                try:
+                    repetitions = self._variables[code_block[0].split()[1]]
+                except KeyError:
+                    self._error_buffer.append((-1, f"Ошибка переменной: использование необъявленной переменной "
+                                                   f"{code_block[0].split()[1]}"))
+                    return [""]
+            return code_block[1:-1] * repetitions
         if code_block[0].strip().startswith("PROCEDURE"):
             self._procedures[code_block[0].split()[1]] = code_block[1:-1]
             return [""]
