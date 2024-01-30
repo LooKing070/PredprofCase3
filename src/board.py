@@ -1,13 +1,13 @@
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import QTimer
-# from random import randint
+from resource_path import resource_path
 
 
 class GameLogic(QWidget):
     def __init__(self, ui, level, terminal):
         super(GameLogic, self).__init__()
-        with open(f"levels/structure{level}.txt", "r") as u:
+        with open(resource_path(f"levels/structure{level}.txt"), "r") as u:
             levelStructure = u.readlines()
         # таймеры
         self.looseTimer, self.animationTimer = QTimer(), QTimer()

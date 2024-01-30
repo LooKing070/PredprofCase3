@@ -1,4 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+from resource_path import resource_path
 
 def level_builder(x_y, level_num=0, symbol="W"):  # строит уровень Длиной и шириной как задал игрок
     """for testItem in x_y.split():
@@ -18,7 +19,7 @@ def level_builder(x_y, level_num=0, symbol="W"):  # строит уровень 
             level.append("{}{}{}{}".format(symbol, "G" * (x - 2), symbol, "\n"))
     level.append(symbol * x)
     if level_num < 0:
-        with open(f"levels/structure{level_num}.txt", "w") as li:
+        with open(resource_path(f"levels/structure{level_num}.txt"), "w") as li:
             li.writelines(level)
     return level
 

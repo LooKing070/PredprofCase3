@@ -1,3 +1,4 @@
+from resource_path import resource_path
 import sqlite3
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
@@ -15,7 +16,7 @@ class MyWidget(QMainWindow, Ui_Soft):
     def __init__(self):
         super().__init__()
         # 1 загрузка
-        with open(f"levels/structure{0}.txt", "r") as u:
+        with open(resource_path(f"levels/structure{0}.txt"), "r") as u:
             levelStructure = u.readlines()
             self.baseWindow = self.setupUi(self, QMainWindow, levelStructure,
                                            len(levelStructure) * len(levelStructure[0]))
@@ -99,7 +100,7 @@ class MyWidget(QMainWindow, Ui_Soft):
             if file_extension[-1] == 'txt':
                 if file_extension[0].split('/')[-1] not in [self.tabWidget.tabText(i) for i in
                                                             range(self.tabWidget.count())]:
-                    with open(file_name) as file:
+                    with open(resource_path(file_name)) as file:
                         text = file.read()
                         widget = Window_In_QTabWidget(file_extension[0].split('/')[-1], text)
                         self.tabWidget.insertTab(self.tabWidget.count() - 1, widget, file_extension[0].split('/')[-1])
@@ -121,7 +122,7 @@ class MyWidget(QMainWindow, Ui_Soft):
                                                   "Текстовый файл (*.txt)", options=options)
         if file:
             if style == "Текстовый файл (*.txt)":
-                with open(file.rstrip('.txt') + '.txt', 'w') as f:
+                with open(resource_path(file.rstrip('.txt') + '.txt'), 'w') as f:
                     f.write(self.tabWidget.widget(self.tabWidget.currentIndex()).text.toPlainText())
 
     def delete_file_up_menu(self):  # сохранение теории в файл
@@ -158,7 +159,7 @@ class MyWidget(QMainWindow, Ui_Soft):
         self.setStyleSheet(self.origin_style)
 
     def set_black_tema(self):
-        self.setStyleSheet(open('designs/style_dark.qss').read())
+        self.setStyleSheet(open(resource_path('designs/style_dark.qss')).read())
 
     def update_shrift_up_menu(self):
         font, ok_pressed = QtWidgets.QFontDialog.getFont()
@@ -168,7 +169,7 @@ class MyWidget(QMainWindow, Ui_Soft):
             self.setStyleSheet(self.origin_style)
             self.setFont(font)
             if self.tema == 'black':
-                self.setStyleSheet(open('designs/style_dark.qss').read())
+                self.setStyleSheet(open(resource_path('designs/style_dark.qss')).read())
 
     def o_programm_up_menu(self):
         self.text = TheoryWindow()
@@ -178,19 +179,24 @@ class MyWidget(QMainWindow, Ui_Soft):
         numb_wind = self.tabWidget.currentIndex()
         self.plainTextEdit.setPlainText('')
         if numb_wind != self.tabWidget.count() - 1:
-            self.interpreter.parse_code(self.tabWidget.widget(numb_wind).text.toPlainText().split('\n'))
-            errors = self.interpreter.error_buffer
-            if errors:
+            try:
+                self.interpreter.parse_code(self.tabWidget.widget(numb_wind).text.toPlainText().split('\n'))
+            except Exception as e:
+                errors = self.interpreter.error_buffer
                 self.plainTextEdit.setPlainText(errors[1])
             else:
-                self.run_game("run")
+                errors = self.interpreter.error_buffer
+                if errors:
+                    self.plainTextEdit.setPlainText(errors[1])
+                else:
+                    self.run_game("run")
 
     def run_game(self, status):
         code = self.interpreter.code_buffer
         self.verticalLayout.removeItem(self.gridLayout)
         self.gridLayout.deleteLater()
         self.playZone.deleteLater()
-        with open(f"levels/structure{0}.txt", "r") as u:
+        with open(resource_path(f"levels/structure{0}.txt"), "r") as u:
             levelStructure = u.readlines()
             add_play_zone(self, levelStructure, len(levelStructure) * len(levelStructure[0]))
         self.gameWindow = GameLogic(self.gridLayout, 0, self.plainTextEdit)

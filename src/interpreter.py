@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from resource_path import resource_path
 
 
 class Interpreter:
@@ -129,7 +130,7 @@ class Interpreter:
 
     def reload_config(self) -> None:
         import tomli
-        with open("interpreter_config.toml", "rb") as f:
+        with open(resource_path("interpreter_config.toml"), "rb") as f:
             self.__config = tomli.load(f)
 
     def move_player(self, direction, steps) -> tuple[str, int]:
@@ -147,16 +148,12 @@ class Interpreter:
         return direction, steps
 
     def set_program_variable(self, name, value):
-        try:
-            value = int(value)
+        if not value.isdigit():
+            self._error_buffer.append((-1, "Значение переменной может быть только числом"))
+        else:
             if value not in range(*self.__config["LIMITATIONS"]["int_values"]):
                 self._error_buffer.append((-1, "Указано неверное значение для числа"))
-        except ValueError:
-            try:
-                value = self._variables[value]
-            except KeyError:
-                self._error_buffer.append((-1, "Использование необъявленной переменной"))
-        self._variables[name] = value
+            self._variables[name] = value
 
     def do_if(self, direction, *code):
         return (f"IF {direction}", 1), self.parse_code(*code, return_code=True)
