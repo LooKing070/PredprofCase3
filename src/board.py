@@ -104,7 +104,7 @@ class GameLogic(QWidget):
             self.looseTimer.stop()
             self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]).widget().raise_()
             self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]) \
-                .widget().setPixmap(QPixmap("textures/PredInterpreterS.jpg"))
+                .widget().setPixmap(QPixmap(resource_path("textures/PredInterpreterS.jpg")))
 
     def run_result(self, result):
         self.animationTimer.stop()
@@ -114,7 +114,7 @@ class GameLogic(QWidget):
             return "Выполнено успешно"
         self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]).widget().raise_()
         self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]) \
-            .widget().setPixmap(QPixmap("textures/PredInterpreterW.jpg"))
+            .widget().setPixmap(QPixmap(resource_path("textures/PredInterpreterW.jpg")))
         self.looseTimer.start()
         return "Исполнение завершено досрочно"
 
