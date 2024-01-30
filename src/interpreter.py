@@ -137,7 +137,7 @@ class Interpreter:
         try:
             steps = int(steps)
             if steps not in range(*self.__config["LIMITATIONS"]["int_values"]):
-                self._error_buffer.append((-1, f"Ошибка значения: указан неверный диапазон {tuple(self.__config["LIMITATIONS"]["int_values"])} для числа"))
+                self._error_buffer.append((-1, f"Ошибка значения: указан неверный диапазон {tuple(self.__config['LIMITATIONS']['int_values'])} для числа"))
         except ValueError:
             try:
                 steps = self._variables[steps]
@@ -153,7 +153,7 @@ class Interpreter:
         else:
             value = int(value)
             if value not in range(*self.__config["LIMITATIONS"]["int_values"]):
-                self._error_buffer.append((-1, f"Ошибка значения: указан неверный диапазон {tuple(self.__config["LIMITATIONS"]["int_values"])} для числа"))
+                self._error_buffer.append((-1, f"Ошибка значения: указан неверный диапазон {tuple(self.__config['LIMITATIONS']['int_values'])} для числа"))
             self._variables[name] = value
 
     def do_if(self, direction, *code):
@@ -165,7 +165,7 @@ class Interpreter:
             if "CALL" in line:
                 if line.split()[1] == procedure_name:
                     self._error_buffer.append((-1, "Ошибка процедуры: рекурсия не поддерживается в рамках проекта"))
-                    return
+                    return []
         if procedure_name in self._procedures.keys():
             return self.parse_code(self._procedures[procedure_name], return_code=True)
         else:
