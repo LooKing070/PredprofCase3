@@ -203,8 +203,9 @@ class MyWidget(QMainWindow, Ui_Soft):
         conn.commit()
         con = sqlite3.connect("sql_bd.db")
         cur = con.cursor()
-        cur.execute(f"""INSERT INTO files VALUES ('main', '')""")
-        con.commit()
+        if not cur.execute('''SELECT * FROM files''').fetchall():
+            cur.execute(f"""INSERT INTO files VALUES ('main', '')""")
+            con.commit()
         conn.close()
 
         con = sqlite3.connect("sql_bd.db")

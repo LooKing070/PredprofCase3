@@ -29,5 +29,4 @@ try:
     main()
     logging.info("Программа завершила работу")
 except Exception as e:
-    logging.critical(e)
     logging.critical(e, exc_info=True)
