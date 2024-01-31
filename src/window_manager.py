@@ -1,7 +1,7 @@
 from resource_path import resource_path
 import sqlite3
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont, QIcon
 
 from maket_prototype import Ui_Soft
 from board import GameLogic
@@ -102,6 +102,16 @@ class MyWidget(QMainWindow, Ui_Soft):
                         con.commit()
                         con.close()
                         self.tabWidget.setCurrentIndex(self.tabWidget.count() - 2)
+            else:
+                msg_box = QMessageBox()
+                msg_box.setWindowIcon(QIcon("icons/PredInterpreter.jpg"))
+                msg_box.setIcon(QMessageBox.Information)
+                msg_box.setWindowTitle("Ошибка при считывании файла")
+                msg_box.setText("Файл использует недопустимый формат")
+                msg_box.addButton(QMessageBox.Ok)
+                msg_box.setDefaultButton(QMessageBox.Ok)
+                # Отображение информационного окошка и ожидание нажатия кнопки "Ок"
+                msg_box.exec_()
 
     def save_file_up_menu(self):  # сохранение теории в файл
         if self.tabWidget.tabText(self.tabWidget.currentIndex()) == '+':
@@ -166,7 +176,6 @@ class MyWidget(QMainWindow, Ui_Soft):
 
     def o_programm_up_menu(self):
         self.text = TheoryWindow()
-        self.text.show()
 
     def give_text_to_interpreter(self):
         numb_wind = self.tabWidget.currentIndex()
@@ -183,6 +192,16 @@ class MyWidget(QMainWindow, Ui_Soft):
                     self.plainTextEdit.setPlainText(errors[1])
                 else:
                     self.run_game("run")
+        else:
+            msg_box = QMessageBox()
+            msg_box.setWindowIcon(QIcon("icons/PredInterpreter.jpg"))
+            msg_box.setIcon(QMessageBox.Information)
+            msg_box.setWindowTitle("Ошибка при запуске программы")
+            msg_box.setText("Выберите файл, из которого хотите запустить код")
+            msg_box.addButton(QMessageBox.Ok)
+            msg_box.setDefaultButton(QMessageBox.Ok)
+            # Отображение информационного окошка и ожидание нажатия кнопки "Ок"
+            msg_box.exec_()
 
     def run_game(self, status):
         code = self.interpreter.code_buffer
@@ -300,6 +319,7 @@ SET (имя) = (число)- устанавливает в переменную 
 Справа находится поле (21х21) с исполнителем. Нажмите на кнопку run, чтобы начать выполнять код, stop, чтобы завершить его выполнение досрочно. Все возможные ошибки будут отображаться в терминале, под полем с исполнителем."""
 
         self.setWindowTitle(theory)
+        self.setWindowIcon(QIcon("icons/PredInterpreter.jpg"))
         self.setGeometry(500, 150, 800, 800)
         layout = QVBoxLayout()
 
@@ -314,19 +334,3 @@ SET (имя) = (число)- устанавливает в переменную 
         layout.addWidget(self.text_edit)
         self.setLayout(layout)
         self.show()
-
-
-    def wheelEvent(self, event):
-        try:
-            if event.angleDelta().y() > 0 and QApplication.keyboardModifiers() == Qt.ControlModifier:
-                self.shrift_size = min(self.shrift_size + 1, 30)
-                font = QFont()
-                font.setPointSize(self.shrift_size)
-                self.text_edit.setFont(font)
-            elif event.angleDelta().y() <= 0 and QApplication.keyboardModifiers() == Qt.ControlModifier:
-                self.shrift_size = max(self.shrift_size - 1, 10)
-                font = QFont()
-                font.setPointSize(self.shrift_size)
-                self.text_edit.setFont(font)
-        except Exception as ex:
-            print(ex)
