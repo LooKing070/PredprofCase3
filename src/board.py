@@ -5,10 +5,15 @@ from resource_path import resource_path
 
 
 class GameLogic(QWidget):
-    def __init__(self, ui, level, terminal):
+    def __init__(self, ui, level, terminal, saved_position=False):
         super(GameLogic, self).__init__()
         with open(resource_path(f"levels/structure{level}.txt"), "r") as u:
             levelStructure = u.readlines()
+            for y in range(len(levelStructure)):
+                if 'T' in levelStructure[y]:
+                    self.trollPosition = [levelStructure[y].find('T'), y]
+                    levelStructure[y] = 'G' * 21
+                    break
         # таймеры
         self.looseTimer, self.animationTimer = QTimer(), QTimer()
         self.animationTimer.setInterval(500)
@@ -17,8 +22,8 @@ class GameLogic(QWidget):
         # геймплейные параметры
         self.gridLayout = ui
         self.vivod = terminal
+        self.saved_position = saved_position
         self.levelStructure = [[j for j in i.rstrip()] for i in levelStructure]
-        self.trollPosition = [0, 0]
         self.troll = self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0])
 
     def troll_move(self, sender):  # куда пойдёт игрок
@@ -108,8 +113,35 @@ class GameLogic(QWidget):
 
     def run_result(self, result):
         self.animationTimer.stop()
+        if self.saved_position:
+            with open(resource_path(f"levels/structure0.txt"), "w") as u:
+                u.writelines(["".join(i) + '\n' for i in self.levelStructure])
+            return f"Выполнено успешно, позиция сохранена {self.trollPosition}"
+        else:
+            with open(resource_path(f"levels/structure0.txt"), "w") as u:
+                u.write("""TGGGGGGGGGGGGGGGGGGGG
+GGGGGGGGGGGGGGGGGGGGG
+GGGGGGGGGGGGGGGGGGGGG
+GGGGGGGGGGGGGGGGGGGGG
+GGGGGGGGGGGGGGGGGGGGG
+GGGGGGGGGGGGGGGGGGGGG
+GGGGGGGGGGGGGGGGGGGGG
+GGGGGGGGGGGGGGGGGGGGG
+GGGGGGGGGGGGGGGGGGGGG
+GGGGGGGGGGGGGGGGGGGGG
+GGGGGGGGGGGGGGGGGGGGG
+GGGGGGGGGGGGGGGGGGGGG
+GGGGGGGGGGGGGGGGGGGGG
+GGGGGGGGGGGGGGGGGGGGG
+GGGGGGGGGGGGGGGGGGGGG
+GGGGGGGGGGGGGGGGGGGGG
+GGGGGGGGGGGGGGGGGGGGG
+GGGGGGGGGGGGGGGGGGGGG
+GGGGGGGGGGGGGGGGGGGGG
+GGGGGGGGGGGGGGGGGGGGG
+GGGGGGGGGGGGGGGGGGGGG""")
         if result == "fieldError":
-            return "Troll не может ходить в стену или убегать с поля"
+            return "Исполнитель не может убегать с поля"
         elif result:
             return "Выполнено успешно"
         self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]).widget().raise_()

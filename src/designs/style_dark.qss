@@ -51,10 +51,6 @@ QPlainTextEdit {
         border: none;
     }
 
-    QTabWidget::tab-bar {
-        alignment: center;
-    }
-
     QTabWidget::tab {
         background-color: #333333;
         color: #FFFFFF;

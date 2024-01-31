@@ -192,7 +192,7 @@ class MyWidget(QMainWindow, Ui_Soft):
         with open(resource_path(f"levels/structure{0}.txt"), "r") as u:
             levelStructure = u.readlines()
             add_play_zone(self, levelStructure, len(levelStructure) * len(levelStructure[0]))
-        self.gameWindow = GameLogic(self.gridLayout, 0, self.plainTextEdit)
+        self.gameWindow = GameLogic(self.gridLayout, 0, self.plainTextEdit, self.saving_position.isChecked())
         self.gameWindow.run_state(state=status, commands=code)
 
     def start_settings(self):
