@@ -1,0 +1,3 @@
+LEFT -5
+DOWN 0
+LEFT 9999

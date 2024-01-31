@@ -1,0 +1,8 @@
+RIGHT 10
+DOW 5
+
+REPET 2
+    UP 1
+    LEFT 2
+    SPIN 360
+ENDREPEAT

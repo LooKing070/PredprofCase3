@@ -16,10 +16,12 @@ class Interpreter:
         self._code_buffer = []
         self._error_buffer: list[tuple[int, str]] = []
 
-    def parse_code(self, code: list[str], return_code: bool = False, reset: bool=False) -> tuple | None:
+    def parse_code(self, code: list[str], return_code: bool = False, reset: bool = False) -> tuple | None:
         if reset:
             self._variables.clear()
             self._procedures.clear()
+            self._code_buffer.clear()
+            self._error_buffer.clear()
         if not any(line.strip() for line in code):
             self._error_buffer.append((-1, "Код отсутствует"))
         stack = []
@@ -155,7 +157,8 @@ class Interpreter:
         try:
             steps = int(steps)
             if steps not in range(*self.__config["LIMITATIONS"]["int_values"]):
-                self._error_buffer.append((-1, f"Ошибка значения: указан неверный диапазон {tuple(self.__config['LIMITATIONS']['int_values'])} для числа"))
+                self._error_buffer.append((-1,
+                                           f"Ошибка значения: указан неверный диапазон {tuple(self.__config['LIMITATIONS']['int_values'])} для числа"))
         except ValueError:
             try:
                 steps = self._variables[steps]
@@ -182,16 +185,17 @@ class Interpreter:
         return (f"IF {direction}", 1), self.parse_code(*code, return_code=True)
 
     def call_procedure(self, procedure_name):
-        procedure_code = self._procedures[procedure_name]
-        for line in procedure_code:
-            if "CALL" in line:
-                if line.split()[1] == procedure_name:
-                    self._error_buffer.append((-1, "Ошибка процедуры: рекурсия не поддерживается в рамках проекта"))
-                    return []
         if procedure_name in self._procedures.keys():
+            procedure_code = self._procedures[procedure_name]
+            for line in procedure_code:
+                if "CALL" in line:
+                    if line.split()[1] == procedure_name:
+                        self._error_buffer.append((-1, "Ошибка процедуры: рекурсия не поддерживается в рамках проекта"))
+                        return [""]
             return self.parse_code(self._procedures[procedure_name], return_code=True)
         else:
-            self._error_buffer.append((-1, f"Ошибка процедуры: попытка вызова несуществующей процедуры {procedure_name}"))
+            self._error_buffer.append(
+                (-1, f"Ошибка процедуры: попытка вызова несуществующей процедуры {procedure_name}"))
 
     @property
     def code_buffer(self) -> list[tuple[str, int]]:

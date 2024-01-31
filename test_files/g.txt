@@ -1,0 +1,18 @@
+IFBLOCK UP
+    DOWN 1
+
+    IFBLOCK LEFT
+
+        REPEAT 3
+
+            IFBLOCK UP
+                DOWN 1
+            ENDIF
+
+            RIGHT 1
+
+        ENDREPEAT
+
+    ENDIF
+
+ENDIF
