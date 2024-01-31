@@ -126,6 +126,8 @@ class Interpreter:
         if code_block[0].strip().startswith("REPEAT"):
             try:
                 repetitions = int(code_block[0].split()[1])
+                if repetitions < 1:
+                    self._error_buffer.append((-1, f"Ошибка значения: цикл должен выполняться минимум 1 раз"))
             except ValueError:
                 try:
                     repetitions = self._variables[code_block[0].split()[1]]
@@ -135,6 +137,10 @@ class Interpreter:
                     return [""]
             return code_block[1:-1] * repetitions
         if code_block[0].strip().startswith("PROCEDURE"):
+            procedure_name = code_block[0].split()[1]
+            if procedure_name in self._procedures:
+                self._error_buffer.append((-1, f"Ошибка имени: процедура {procedure_name} уже существует"))
+                return [""]
             self._procedures[code_block[0].split()[1]] = code_block[1:-1]
             return [""]
         if code_block[0].strip().startswith("IFBLOCK"):
@@ -160,13 +166,17 @@ class Interpreter:
         return direction, steps
 
     def set_program_variable(self, name, value):
-        if not value.isdigit():
-            self._error_buffer.append((-1, "Ошибка переменной: значение переменной может быть только числом"))
-        else:
+        try:
             value = int(value)
             if value not in range(*self.__config["LIMITATIONS"]["int_values"]):
-                self._error_buffer.append((-1, f"Ошибка значения: указан неверный диапазон {tuple(self.__config['LIMITATIONS']['int_values'])} для числа"))
+                self._error_buffer.append((-1,
+                                           f"Ошибка значения: указан неверный диапазон {tuple(self.__config['LIMITATIONS']['int_values'])} для числа"))
             self._variables[name] = value
+        except ValueError:
+            if value in self._variables:
+                self._variables[name] = self._variables[value]
+            else:
+                self._error_buffer.append((-1, f"Ошибка переменной: использование необъявленной переменной {value}"))
 
     def do_if(self, direction, *code):
         return (f"IF {direction}", 1), self.parse_code(*code, return_code=True)
