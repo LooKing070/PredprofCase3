@@ -181,9 +181,11 @@ GGGGGGGGGGGGGGGGGGGGG""")
 
     def set_white_tema(self):
         self.setStyleSheet(self.origin_style)
+        self.saving_position.setStyleSheet("color: black")
 
     def set_black_tema(self):
         self.setStyleSheet(open(resource_path('designs/style_dark.qss')).read())
+        self.saving_position.setStyleSheet("color: #fff")
 
     def update_shrift_up_menu(self):
         font, ok_pressed = QtWidgets.QFontDialog.getFont()
