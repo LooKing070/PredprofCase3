@@ -12,7 +12,6 @@ class GameLogic(QWidget):
             for y in range(len(levelStructure)):
                 if 'T' in levelStructure[y]:
                     self.trollPosition = [levelStructure[y].find('T'), y]
-                    levelStructure[y] = 'G' * 21
                     break
             else:
                 self.trollPosition = [0, 0]
@@ -59,7 +58,7 @@ class GameLogic(QWidget):
             return not self.move_try([self.trollPosition[0], self.trollPosition[1] + 1])
 
     def move_try(self, sector_x_y):  # что произойдёт, если игрок куда-то пойдёт
-        if sector_x_y[0] < 0 or sector_x_y[0] >= len(self.levelStructure[0])\
+        if sector_x_y[0] < 0 or sector_x_y[0] >= len(self.levelStructure[0]) \
                 or sector_x_y[1] < 0 or sector_x_y[1] >= len(self.levelStructure):
             return False
         elif self.levelStructure[sector_x_y[1]][sector_x_y[0]] == "W":
@@ -110,10 +109,10 @@ class GameLogic(QWidget):
         elif animation == "loose":
             self.looseTimer.stop()
             self.stopSender.setEnabled(True)
-            self.runSender.setEnabled(True)
             self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]).widget().raise_()
             self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]) \
                 .widget().setPixmap(QPixmap(resource_path("textures/PredInterpreterT.jpg")))
+            self.runSender.setEnabled(True)
 
     def save_position(self, result):
         if self.saved_position:
@@ -128,8 +127,10 @@ class GameLogic(QWidget):
     def run_result(self, result):
         self.animationTimer.stop()
         if result == "fieldError":
-            return self.save_position("Исполнитель не может убегать с поля")
+            self.runSender.setEnabled(True)
+            return self.save_position("Исполнитель не может убегать с поля и ходить в препятствие")
         elif result:
+            self.runSender.setEnabled(True)
             return self.save_position("Выполнено успешно")
         self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]).widget().raise_()
         self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]) \
@@ -137,13 +138,14 @@ class GameLogic(QWidget):
         self.looseTimer.start()
         return self.save_position("Исполнение завершено досрочно")
 
-    def run_state(self, state="run", commands=(("IF LEFT", 1), ("IF RIGHT", 1), ("IF UP", 1), ("IF DOWN", 1))):
+    def run_state(self, state="stop", commands=(("IF LEFT", 1), ("IF RIGHT", 1), ("IF UP", 1), ("IF DOWN", 1))):
         self.stateSender = self.sender()
         if isinstance(self.stateSender, QPushButton):
             if self.stateSender.text() == "stop":
                 self.stateSender.setDisabled(True)
                 self.stopSender = self.stateSender
             elif self.stateSender.text() == "run":
+                self.stateSender.setDisabled(True)
                 self.runSender = self.stateSender
         if state == "run":
             self.commands = commands
@@ -151,7 +153,11 @@ class GameLogic(QWidget):
             self.animationTimer.timeout.connect(lambda: self.animan("walk", self.commands.pop(0)))
             self.animationTimer.start(500)
         elif state == "stop":
-            self.runSender.setDisabled(True)
-            self.vivod.setPlainText(self.run_result(False))
+            try:
+                self.runSender.setDisabled(True)
+                self.vivod.setPlainText(self.run_result(False))
+            except AttributeError:
+                self.vivod.setPlainText("Чтобы остановить скрипт, запустите его")
+                self.stopSender.setEnabled(True)
         elif state == "fieldError":
             self.vivod.setPlainText(self.run_result("fieldError"))
