@@ -20,6 +20,7 @@ class MyWidget(QMainWindow, Ui_Soft):
             levelStructure = u.readlines()
             self.baseWindow = self.setupUi(self, QMainWindow, levelStructure,
                                            len(levelStructure) * len(levelStructure[0]))
+        self.gameWindow = GameLogic(self.gridLayout, 0, self.plainTextEdit)
         self.interpreter = Interpreter()
 
         self.setWindowTitle('Собственный интерпретатор')
