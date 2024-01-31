@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QWidget, QPushButton
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import QTimer
 from resource_path import resource_path
@@ -14,6 +14,8 @@ class GameLogic(QWidget):
                     self.trollPosition = [levelStructure[y].find('T'), y]
                     levelStructure[y] = 'G' * 21
                     break
+            else:
+                self.trollPosition = [0, 0]
         # таймеры
         self.looseTimer, self.animationTimer = QTimer(), QTimer()
         self.animationTimer.setInterval(500)
@@ -66,13 +68,13 @@ class GameLogic(QWidget):
             self.run_result(False)
         elif self.levelStructure[sector_x_y[1]][sector_x_y[0]] == "F":
             self.run_result(True)
-        self.levelStructure[sector_x_y[1]][sector_x_y[0]] = "T"
         return True
 
     def troll_moving(self, x_y):  # сама ходьба
         self.levelStructure[self.trollPosition[1]][self.trollPosition[0]] = "G"
         self.trollPosition[0] += x_y[0]
         self.trollPosition[1] += x_y[1]
+        self.levelStructure[self.trollPosition[1]][self.trollPosition[0]] = "T"
         element = self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0])
         self.gridLayout.removeItem(self.troll)
         self.gridLayout.removeItem(element)
@@ -107,56 +109,49 @@ class GameLogic(QWidget):
                 self.vivod.setPlainText(self.run_result(True))
         elif animation == "loose":
             self.looseTimer.stop()
+            self.stopSender.setEnabled(True)
+            self.runSender.setEnabled(True)
             self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]).widget().raise_()
             self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]) \
                 .widget().setPixmap(QPixmap(resource_path("textures/PredInterpreterT.jpg")))
 
+    def save_position(self, result):
+        if self.saved_position:
+            result += f", позиция сохранена {self.trollPosition}"
+        else:
+            self.levelStructure[self.trollPosition[1]][self.trollPosition[0]] = 'G'
+            self.levelStructure[0][0] = 'T'
+        with open(resource_path(f"levels/structure0.txt"), "w") as u:
+            u.writelines(["".join(i) + '\n' for i in self.levelStructure])
+        return result
+
     def run_result(self, result):
         self.animationTimer.stop()
-        if self.saved_position:
-            with open(resource_path(f"levels/structure0.txt"), "w") as u:
-                u.writelines(["".join(i) + '\n' for i in self.levelStructure])
-            return f"Выполнено успешно, позиция сохранена {self.trollPosition}"
-        else:
-            with open(resource_path(f"levels/structure0.txt"), "w") as u:
-                u.write("""TGGGGGGGGGGGGGGGGGGGG
-GGGGGGGGGGGGGGGGGGGGG
-GGGGGGGGGGGGGGGGGGGGG
-GGGGGGGGGGGGGGGGGGGGG
-GGGGGGGGGGGGGGGGGGGGG
-GGGGGGGGGGGGGGGGGGGGG
-GGGGGGGGGGGGGGGGGGGGG
-GGGGGGGGGGGGGGGGGGGGG
-GGGGGGGGGGGGGGGGGGGGG
-GGGGGGGGGGGGGGGGGGGGG
-GGGGGGGGGGGGGGGGGGGGG
-GGGGGGGGGGGGGGGGGGGGG
-GGGGGGGGGGGGGGGGGGGGG
-GGGGGGGGGGGGGGGGGGGGG
-GGGGGGGGGGGGGGGGGGGGG
-GGGGGGGGGGGGGGGGGGGGG
-GGGGGGGGGGGGGGGGGGGGG
-GGGGGGGGGGGGGGGGGGGGG
-GGGGGGGGGGGGGGGGGGGGG
-GGGGGGGGGGGGGGGGGGGGG
-GGGGGGGGGGGGGGGGGGGGG""")
         if result == "fieldError":
-            return "Исполнитель не может убегать с поля"
+            return self.save_position("Исполнитель не может убегать с поля")
         elif result:
-            return "Выполнено успешно"
+            return self.save_position("Выполнено успешно")
         self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]).widget().raise_()
         self.gridLayout.itemAtPosition(self.trollPosition[1], self.trollPosition[0]) \
             .widget().setPixmap(QPixmap(resource_path("textures/PredInterpreterS.jpg")))
         self.looseTimer.start()
-        return "Исполнение завершено досрочно"
+        return self.save_position("Исполнение завершено досрочно")
 
     def run_state(self, state="run", commands=(("IF LEFT", 1), ("IF RIGHT", 1), ("IF UP", 1), ("IF DOWN", 1))):
+        self.stateSender = self.sender()
+        if isinstance(self.stateSender, QPushButton):
+            if self.stateSender.text() == "stop":
+                self.stateSender.setDisabled(True)
+                self.stopSender = self.stateSender
+            elif self.stateSender.text() == "run":
+                self.runSender = self.stateSender
         if state == "run":
             self.commands = commands
             self.commands.append(commands[-1])
             self.animationTimer.timeout.connect(lambda: self.animan("walk", self.commands.pop(0)))
             self.animationTimer.start(500)
         elif state == "stop":
+            self.runSender.setDisabled(True)
             self.vivod.setPlainText(self.run_result(False))
         elif state == "fieldError":
             self.vivod.setPlainText(self.run_result("fieldError"))
