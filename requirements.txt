@@ -2,3 +2,4 @@ PyQt5==5.15.9
 pyqt5-tools==5.15.9.3.3
 PyQt5-sip==12.12.2
 tomli~=2.0.1
+toml==0.10.2
