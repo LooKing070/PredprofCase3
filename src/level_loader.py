@@ -1,6 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from resource_path import resource_path
 
+
 def level_builder(x_y, level_num=0, symbol="W"):  # строит уровень Длиной и шириной как задал игрок
     """for testItem in x_y.split():
         if not testItem.isdigit():

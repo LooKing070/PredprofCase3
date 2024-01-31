@@ -58,7 +58,7 @@ class GameLogic(QWidget):
             return not self.move_try([self.trollPosition[0], self.trollPosition[1] + 1])
 
     def move_try(self, sector_x_y):  # что произойдёт, если игрок куда-то пойдёт
-        if sector_x_y[0] < 0 or sector_x_y[0] >= len(self.levelStructure[0])\
+        if sector_x_y[0] < 0 or sector_x_y[0] >= len(self.levelStructure[0]) \
                 or sector_x_y[1] < 0 or sector_x_y[1] >= len(self.levelStructure):
             return False
         elif self.levelStructure[sector_x_y[1]][sector_x_y[0]] == "W":
